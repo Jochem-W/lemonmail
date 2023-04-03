@@ -1,7 +1,6 @@
-import { Handlers } from "./handlers.mjs"
 import { Discord } from "./clients.mjs"
+import { Handlers } from "./handlers.mjs"
 import { Variables } from "./variables.mjs"
-
 
 for (const handler of Handlers) {
   if (handler.once) {

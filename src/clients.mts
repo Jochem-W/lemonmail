@@ -1,5 +1,5 @@
-import { Client, GatewayIntentBits, Partials } from "discord.js"
 import { Variables } from "./variables.mjs"
+import { Client, GatewayIntentBits, Partials } from "discord.js"
 
 export const Discord = new Client({
   intents: [
@@ -10,7 +10,7 @@ export const Discord = new Client({
     GatewayIntentBits.DirectMessageReactions,
     GatewayIntentBits.DirectMessageTyping,
     GatewayIntentBits.GuildMessageReactions,
-    GatewayIntentBits.GuildMessageTyping
+    GatewayIntentBits.GuildMessageTyping,
   ],
   partials: [
     Partials.User,
@@ -20,6 +20,6 @@ export const Discord = new Client({
     Partials.Reaction,
     Partials.GuildScheduledEvent,
     Partials.ThreadMember,
-  ]
+  ],
 })
 Discord.rest.setToken(Variables.discordToken)

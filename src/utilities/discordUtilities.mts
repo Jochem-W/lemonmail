@@ -22,8 +22,8 @@ import type {
   Interaction,
   UserResolvable,
 } from "discord.js"
-const guild = await Discord.guilds.fetch(DefaultConfig.guild.id)
 
+const guild = await Discord.guilds.fetch(DefaultConfig.guild.id)
 
 export async function tryFetchMember(
   options: FetchMemberOptions | UserResolvable

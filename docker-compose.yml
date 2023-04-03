@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  bot:
+    build: .
+    env_file: .env
+    volumes:
+      - ./persisted/bot:/app/persisted/bot
+    restart: unless-stopped
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    env_file: .env.db
+    environment:
+      POSTGRES_USER: lemonmail
+    volumes:
+      - ./persisted/db/data:/var/lib/postgresql/data
+    restart: unless-stopped

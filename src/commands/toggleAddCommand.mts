@@ -47,7 +47,6 @@ export class ToggleAddCommand extends ChatInputCommand {
             } be added to new ModMail threads`
           ),
       ],
-      ephemeral: true,
     })
   }
 }

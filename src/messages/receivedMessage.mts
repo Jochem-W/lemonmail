@@ -20,7 +20,14 @@ export async function receivedMessage(message: Message) {
     footer.iconURL = iconURL
   }
 
-  const embed = new EmbedBuilder()
+  let embed
+  if (images.length === 10) {
+    embed = images.shift() as EmbedBuilder
+  } else {
+    embed = new EmbedBuilder()
+  }
+
+  embed
     .setAuthor({
       name: formatName(member),
       iconURL: member.displayAvatarURL(),

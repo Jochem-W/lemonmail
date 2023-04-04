@@ -13,7 +13,14 @@ export async function sentMessage(message: Message) {
 
   const images = attachmentsToEmbeds(message, colour)
 
-  const embed = new EmbedBuilder()
+  let embed
+  if (images.length === 10) {
+    embed = images.shift() as EmbedBuilder
+  } else {
+    embed = new EmbedBuilder()
+  }
+
+  embed
     .setTitle("Message sent")
     .setDescription(
       message.content.replace(DefaultConfig.sendPrefix, "") || null

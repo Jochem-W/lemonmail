@@ -6,7 +6,9 @@ import { fetchChannel } from "../utilities/discordUtilities.mjs"
 import {
   ChannelType,
   ChatInputCommandInteraction,
+  DiscordAPIError,
   PermissionFlagsBits,
+  RESTJSONErrorCodes,
 } from "discord.js"
 
 export class CloseCommand extends ChatInputCommand {
@@ -46,11 +48,20 @@ export class CloseCommand extends ChatInputCommand {
     const message = await threadStatusMessage(interaction, "closed")
     await interaction.editReply(message)
 
+    try {
+      await Discord.users.send(thread.userId, message)
+    } catch (e) {
+      if (
+        !(e instanceof DiscordAPIError) ||
+        e.code !== RESTJSONErrorCodes.CannotSendMessagesToThisUser
+      ) {
+        throw e
+      }
+    }
+
     const channel = await fetchChannel(thread.id, ChannelType.PublicThread)
     await channel.setName(`${channel.name} (${reason ?? "closed"})`)
     await channel.setLocked(true)
     await channel.setArchived(true)
-
-    await Discord.users.send(thread.userId, message)
   }
 }

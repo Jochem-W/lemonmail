@@ -1,16 +1,24 @@
 import { Discord, Prisma } from "../clients.mjs"
 import { NoTargetUserError, ThreadAlreadyExistsError } from "../errors.mjs"
+import { dmsDisabledMessage } from "../messages/dmsDisabledMessage.mjs"
+import { memberLeftMessage } from "../messages/memberLeftMessage.mjs"
 import { receivedMessage } from "../messages/receivedMessage.mjs"
 import { sentMessage } from "../messages/sentMessage.mjs"
 import { staffInfoMessage } from "../messages/staffInfoMessage.mjs"
 import { userInfoMessage } from "../messages/userInfoMessage.mjs"
 import { DefaultConfig } from "../models/config.mjs"
-import { fetchChannel } from "./discordUtilities.mjs"
+import { fetchChannel, tryFetchMember } from "./discordUtilities.mjs"
 import type {
   ChatInputCommandInteraction,
   UserContextMenuCommandInteraction,
 } from "discord.js"
-import { ChannelType, EmbedBuilder, Message } from "discord.js"
+import {
+  ChannelType,
+  DiscordAPIError,
+  EmbedBuilder,
+  Message,
+  RESTJSONErrorCodes,
+} from "discord.js"
 import { MIMEType } from "util"
 
 const guild = await Discord.guilds.fetch(DefaultConfig.guild.id)
@@ -20,7 +28,7 @@ const mailForum = await fetchChannel(
 )
 
 export function attachmentsToEmbeds(message: Message, colour?: number) {
-  const images = []
+  const embeds = []
   for (const attachment of message.attachments.values()) {
     if (!attachment.contentType) {
       continue
@@ -28,7 +36,7 @@ export function attachmentsToEmbeds(message: Message, colour?: number) {
 
     const mimeType = new MIMEType(attachment.contentType)
     if (mimeType.type === "image") {
-      images.push(
+      embeds.push(
         new EmbedBuilder()
           .setImage(`attachment://${attachment.name}`)
           .setColor(colour ?? null)
@@ -36,7 +44,7 @@ export function attachmentsToEmbeds(message: Message, colour?: number) {
     }
   }
 
-  return images
+  return embeds
 }
 
 export async function createThreadFromMessage(message: Message) {
@@ -83,10 +91,11 @@ export async function createThreadFromInteraction(
 
   const member = await guild.members.fetch(user)
 
-  if (
-    await Prisma.thread.findFirst({ where: { userId: user.id, active: true } })
-  ) {
-    throw new ThreadAlreadyExistsError(member)
+  let thread = await Prisma.thread.findFirst({
+    where: { userId: user.id, active: true },
+  })
+  if (thread) {
+    throw new ThreadAlreadyExistsError(thread, member)
   }
 
   const channel = await mailForum.threads.create({
@@ -101,7 +110,7 @@ export async function createThreadFromInteraction(
     await channel.members.add(staffMember.id)
   }
 
-  const thread = await Prisma.thread.create({
+  thread = await Prisma.thread.create({
     data: {
       id: channel.id,
       userId: member.id,
@@ -111,7 +120,18 @@ export async function createThreadFromInteraction(
     },
   })
 
-  await user.send(await userInfoMessage(interaction, "opened"))
+  try {
+    await user.send(await userInfoMessage(interaction, "opened"))
+  } catch (e) {
+    if (
+      !(e instanceof DiscordAPIError) ||
+      e.code !== RESTJSONErrorCodes.CannotSendMessagesToThisUser
+    ) {
+      throw e
+    }
+
+    await channel.send(dmsDisabledMessage(member))
+  }
 
   return thread
 }
@@ -129,8 +149,30 @@ export async function processGuildMessage(message: Message) {
     return
   }
 
-  const member = await guild.members.fetch(thread.userId)
-  await member.send(await receivedMessage(message))
+  const member = await tryFetchMember(thread.userId)
+  if (!member) {
+    await message.channel.send(memberLeftMessage(thread, message))
+    return
+  }
+
+  try {
+    await member.send(await receivedMessage(message))
+  } catch (e) {
+    if (
+      !(e instanceof DiscordAPIError) ||
+      e.code !== RESTJSONErrorCodes.CannotSendMessagesToThisUser
+    ) {
+      throw e
+    }
+
+    await message.channel.send(dmsDisabledMessage(member, message))
+    await Prisma.thread.update({
+      where: { id: thread.id },
+      data: { lastMessage: message.id },
+    })
+    return
+  }
+
   await message.channel.send(await sentMessage(message))
   await message.delete()
 
@@ -152,7 +194,17 @@ export async function processDmMessage(message: Message) {
   const channel = await fetchChannel(thread.id, ChannelType.PublicThread)
 
   await channel.send(await receivedMessage(message))
-  await message.author.send(await sentMessage(message))
+
+  try {
+    await message.author.send(await sentMessage(message))
+  } catch (e) {
+    const member = await tryFetchMember(message.author.id)
+    if (!member) {
+      await channel.send(memberLeftMessage(thread))
+    } else {
+      await channel.send(dmsDisabledMessage(member))
+    }
+  }
 
   await Prisma.thread.update({
     where: { id: thread.id },

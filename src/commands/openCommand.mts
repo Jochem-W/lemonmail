@@ -23,17 +23,18 @@ export class OpenCommand extends ChatInputCommand {
   public async handle(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply({ ephemeral: true })
 
+    let thread
     try {
-      await createThreadFromInteraction(interaction)
+      thread = await createThreadFromInteraction(interaction)
     } catch (e) {
       if (e instanceof ThreadAlreadyExistsError) {
-        await interaction.editReply(threadAlreadyExistsMessage())
+        await interaction.editReply(threadAlreadyExistsMessage(e.thread))
         return
       }
 
       throw e
     }
 
-    await interaction.editReply(threadOpenedMessage())
+    await interaction.editReply(threadOpenedMessage(thread))
   }
 }

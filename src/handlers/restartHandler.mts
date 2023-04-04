@@ -61,7 +61,6 @@ export class RestartHandler implements Handler<"ready"> {
       })
 
       for (const message of messages) {
-        console.log(message)
         if (message.inGuild()) {
           await processGuildMessage(message)
           continue

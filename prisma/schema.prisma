@@ -7,3 +7,24 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Source {
+  DM
+  GUILD
+}
+
+model Thread {
+  id String @id
+
+  userId       String
+  active       Boolean
+  source       Source
+  closedReason String?
+  lastMessage  String
+}
+
+model StaffMember {
+  id String @id
+
+  addToThread Boolean
+}

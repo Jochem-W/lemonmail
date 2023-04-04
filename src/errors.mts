@@ -4,8 +4,8 @@ import { customIdToString } from "./models/customId.mjs"
 import type { Command } from "./types/command.mjs"
 import { fetchChannel } from "./utilities/discordUtilities.mjs"
 import { makeErrorEmbed } from "./utilities/embedUtilities.mjs"
-import { Attachment, ChannelType, CommandInteraction } from "discord.js"
-import type { Snowflake, Channel } from "discord.js"
+import { ChannelType, CommandInteraction, GuildMember } from "discord.js"
+import type { Channel } from "discord.js"
 
 class CustomError extends Error {
   public constructor(message: string) {
@@ -17,6 +17,18 @@ class CustomError extends Error {
 export class BotError extends CustomError {
   public constructor(message: string) {
     super(message)
+  }
+}
+
+export class ThreadAlreadyExistsError extends BotError {
+  public constructor(member: GuildMember) {
+    super(`A thread for ${member.user.tag} (${member.id}) already exists`)
+  }
+}
+
+export class NoTargetUserError extends BotError {
+  public constructor() {
+    super("A target user couldn't be found")
   }
 }
 
@@ -86,24 +98,6 @@ export class GuildOnlyError extends BotError {
   }
 }
 
-export class InvalidPenaltyError extends BotError {
-  public constructor(penalty: string) {
-    super(`Invalid penalty "${penalty}".`)
-  }
-}
-
-export class NoContentTypeError extends BotError {
-  public constructor(attachment: Attachment) {
-    super(`The file "${attachment.name}" has an invalid filetype.`)
-  }
-}
-
-export class ImageOnlyError extends BotError {
-  public constructor(attachment: Attachment) {
-    super(`The file "${attachment.name}" is not an image.`)
-  }
-}
-
 export class InvalidCustomIdError extends BotError {
   public constructor(customId: string | CustomId) {
     if (typeof customId !== "string") {
@@ -139,24 +133,6 @@ export class OwnerOnlyError extends BotError {
   }
 }
 
-export class AuditLogNotFoundError extends BotError {
-  public constructor(message: string) {
-    super(message)
-  }
-}
-
-export class InvalidAuditLogEntryError extends BotError {
-  public constructor(message: string) {
-    super(message)
-  }
-}
-
-export class NoValidCodeError extends BotError {
-  public constructor(message: string) {
-    super(message)
-  }
-}
-
 export class ButtonNotFoundError extends BotError {
   public constructor(customId: CustomId) {
     super(`Couldn't find a button for custom ID ${customIdToString(customId)}`)
@@ -178,36 +154,6 @@ export class DuplicateNameError extends BotError {
 export class UnregisteredNameError extends BotError {
   public constructor(type: "button" | "modal", name: string) {
     super(`A ${type} with the name ${name} doesn't exist`)
-  }
-}
-
-export class InvalidPathError extends BotError {
-  public constructor(value: string) {
-    super(`The supplied path ${value} is invalid`)
-  }
-}
-
-export class InvalidMethodError extends BotError {
-  public constructor(value: string) {
-    super(`The supplied method ${value} is invalid`)
-  }
-}
-
-export class InvalidEmbedError extends CustomError {
-  public constructor(message: string) {
-    super(message)
-  }
-}
-
-export class NoMessageRevisionsError extends CustomError {
-  public constructor(id: Snowflake) {
-    super(`Message with ID "${id}" has no revisions`)
-  }
-}
-
-export class InvalidStreamError extends CustomError {
-  public constructor() {
-    super("The stream isn't an instance of Readable")
   }
 }
 

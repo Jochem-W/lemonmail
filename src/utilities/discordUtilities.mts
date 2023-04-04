@@ -7,8 +7,9 @@ import {
 } from "../errors.mjs"
 import { DefaultConfig } from "../models/config.mjs"
 import type {
+  Channel,
   FetchChannelOptions,
-  GuildBasedChannel,
+  PublicThreadChannel,
   Snowflake,
 } from "discord.js"
 import {
@@ -56,7 +57,11 @@ export async function fetchChannel<T extends ChannelType>(
     throw new InvalidChannelTypeError(channel, type)
   }
 
-  return channel as Extract<GuildBasedChannel, { type: T }>
+  return channel as T extends
+    | ChannelType.PublicThread
+    | ChannelType.AnnouncementThread
+    ? PublicThreadChannel
+    : Extract<Channel, { type: T }>
 }
 
 export async function fetchInteractionGuild(interaction: Interaction) {

@@ -1,4 +1,5 @@
 import { Variables } from "./variables.mjs"
+import { PrismaClient } from "@prisma/client"
 import { Client, GatewayIntentBits, Partials } from "discord.js"
 
 export const Discord = new Client({
@@ -23,3 +24,4 @@ export const Discord = new Client({
   ],
 })
 Discord.rest.setToken(Variables.discordToken)
+export const Prisma = new PrismaClient()

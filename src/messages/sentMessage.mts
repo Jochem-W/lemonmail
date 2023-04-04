@@ -13,18 +13,11 @@ export async function sentMessage(message: Message) {
 
   const images = attachmentsToEmbeds(message, colour)
 
-  const footer: EmbedFooterOptions = { text: guild.name }
-  const iconURL = guild.iconURL()
-  if (iconURL) {
-    footer.iconURL = iconURL
-  }
-
   const embed = new EmbedBuilder()
     .setTitle("Message sent")
     .setDescription(
       message.content.replace(DefaultConfig.sendPrefix, "") || null
     )
-    .setFooter(footer)
     .setTimestamp(message.createdTimestamp)
     .setColor(colour)
 
@@ -34,6 +27,14 @@ export async function sentMessage(message: Message) {
       name: formatName(member),
       iconURL: member.displayAvatarURL(),
     })
+  } else {
+    const footer: EmbedFooterOptions = { text: guild.name }
+    const iconURL = guild.iconURL()
+    if (iconURL) {
+      footer.iconURL = iconURL
+    }
+
+    embed.setFooter(footer)
   }
 
   return {

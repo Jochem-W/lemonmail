@@ -20,22 +20,24 @@ export async function receivedMessage(message: Message) {
     footer.iconURL = iconURL
   }
 
+  const embed = new EmbedBuilder()
+    .setAuthor({
+      name: formatName(member),
+      iconURL: member.displayAvatarURL(),
+    })
+    .setTitle("Message received")
+    .setDescription(
+      message.content.replace(DefaultConfig.sendPrefix, "") || null
+    )
+    .setTimestamp(message.createdTimestamp)
+    .setColor(colour)
+
+  if (message.inGuild()) {
+    embed.setFooter(footer)
+  }
+
   return {
-    embeds: [
-      new EmbedBuilder()
-        .setAuthor({
-          name: formatName(member),
-          iconURL: member.displayAvatarURL(),
-        })
-        .setTitle("Message received")
-        .setDescription(
-          message.content.replace(DefaultConfig.sendPrefix, "") || null
-        )
-        .setFooter(footer)
-        .setTimestamp(message.createdTimestamp)
-        .setColor(colour),
-      ...images,
-    ],
+    embeds: [embed, ...images],
     files: [...message.attachments.values()],
   }
 }

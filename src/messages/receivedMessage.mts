@@ -28,7 +28,9 @@ export async function receivedMessage(message: Message) {
           iconURL: member.displayAvatarURL(),
         })
         .setTitle("Message received")
-        .setDescription(message.content || null)
+        .setDescription(
+          message.content.replace(DefaultConfig.sendPrefix, "") || null
+        )
         .setFooter(footer)
         .setTimestamp(message.createdTimestamp)
         .setColor(colour),

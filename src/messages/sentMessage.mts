@@ -21,7 +21,9 @@ export async function sentMessage(message: Message) {
 
   const embed = new EmbedBuilder()
     .setTitle("Message sent")
-    .setDescription(message.content || null)
+    .setDescription(
+      message.content.replace(DefaultConfig.sendPrefix, "") || null
+    )
     .setFooter(footer)
     .setTimestamp(message.createdTimestamp)
     .setColor(colour)

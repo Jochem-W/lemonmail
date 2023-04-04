@@ -1,4 +1,5 @@
 import { Prisma } from "../clients.mjs"
+import { DefaultConfig } from "../models/config.mjs"
 import type { Handler } from "../types/handler.mjs"
 import {
   processDmMessage,
@@ -24,7 +25,7 @@ export class MessageCreateHandler implements Handler<"messageCreate"> {
       return
     }
 
-    if (message.content.startsWith("=") || message.content.startsWith("/")) {
+    if (!message.content.startsWith(DefaultConfig.sendPrefix)) {
       return
     }
 

@@ -1,6 +1,7 @@
 import { Prisma } from "../clients.mjs"
 import { RegisteredCommands } from "../commands.mjs"
 import { CommandNotFoundByNameError } from "../errors.mjs"
+import { DefaultConfig } from "../models/config.mjs"
 import { formatName } from "../utilities/embedUtilities.mjs"
 import type { GuildMember } from "discord.js"
 import {
@@ -37,9 +38,9 @@ export async function staffInfoMessage(member: GuildMember) {
         })
         .setTitle("New thread")
         .setDescription(
-          `Prefix a message with ${inlineCode(
-            "=send"
-          )} to reply. Use ${chatInputApplicationCommandMention(
+          `Prefix a message with "${inlineCode(
+            DefaultConfig.sendPrefix.trim()
+          )}" to reply. Use ${chatInputApplicationCommandMention(
             closeCommand.command.builder.name,
             closeCommand.id
           )} to close the thread.`

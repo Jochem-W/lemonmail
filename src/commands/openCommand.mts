@@ -1,7 +1,9 @@
-import { ThreadAlreadyExistsError } from "../errors.mjs"
+import { Prisma } from "../clients.mjs"
 import { threadAlreadyExistsMessage } from "../messages/threadAlreadyExistsMessage.mjs"
 import { threadOpenedMessage } from "../messages/threadOpenedMessage.mjs"
+import { userNotInGuildMessage } from "../messages/userNotInGuildMessage.mjs"
 import { ChatInputCommand } from "../models/chatInputCommand.mjs"
+import { tryFetchMember } from "../utilities/discordUtilities.mjs"
 import { createThreadFromInteraction } from "../utilities/threadUtilities.mjs"
 import { ChatInputCommandInteraction, PermissionFlagsBits } from "discord.js"
 
@@ -23,17 +25,22 @@ export class OpenCommand extends ChatInputCommand {
   public async handle(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply({ ephemeral: true })
 
-    let thread
-    try {
-      thread = await createThreadFromInteraction(interaction)
-    } catch (e) {
-      if (e instanceof ThreadAlreadyExistsError) {
-        await interaction.editReply(threadAlreadyExistsMessage(e.thread))
-        return
-      }
-
-      throw e
+    const user = interaction.options.getUser("user", true)
+    let thread = await Prisma.thread.findFirst({
+      where: { userId: user.id, active: true },
+    })
+    if (thread) {
+      await interaction.editReply(threadAlreadyExistsMessage(thread))
+      return
     }
+
+    const member = await tryFetchMember(user.id)
+    if (!member) {
+      await interaction.editReply(userNotInGuildMessage(user))
+      return
+    }
+
+    thread = await createThreadFromInteraction(member, interaction)
 
     await interaction.editReply(threadOpenedMessage(thread))
   }

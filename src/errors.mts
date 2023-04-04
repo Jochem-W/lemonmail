@@ -4,8 +4,7 @@ import { customIdToString } from "./models/customId.mjs"
 import type { Command } from "./types/command.mjs"
 import { fetchChannel } from "./utilities/discordUtilities.mjs"
 import { makeErrorEmbed } from "./utilities/embedUtilities.mjs"
-import type { Thread } from "@prisma/client"
-import { ChannelType, CommandInteraction, GuildMember } from "discord.js"
+import { ChannelType, CommandInteraction } from "discord.js"
 import type { Channel } from "discord.js"
 
 class CustomError extends Error {
@@ -18,21 +17,6 @@ class CustomError extends Error {
 export class BotError extends CustomError {
   public constructor(message: string) {
     super(message)
-  }
-}
-
-export class ThreadAlreadyExistsError extends BotError {
-  public readonly thread: Thread
-
-  public constructor(thread: Thread, member: GuildMember) {
-    super(`A thread for ${member.user.tag} (${member.id}) already exists`)
-    this.thread = thread
-  }
-}
-
-export class NoTargetUserError extends BotError {
-  public constructor() {
-    super("A target user couldn't be found")
   }
 }
 

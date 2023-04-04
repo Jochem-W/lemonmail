@@ -1,6 +1,6 @@
 import { Discord, Prisma } from "../clients.mjs"
 import { invalidThreadMessage } from "../messages/invalidThreadMessage.mjs"
-import { userInfoMessage } from "../messages/userInfoMessage.mjs"
+import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
 import { ChatInputCommand } from "../models/chatInputCommand.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
 import {
@@ -40,25 +40,17 @@ export class CloseCommand extends ChatInputCommand {
     await interaction.deferReply()
     await Prisma.thread.update({
       where: { id: thread.id },
-      data: {
-        active: false,
-        closedReason: reason,
-        lastMessage: interaction.id,
-      },
+      data: { active: false, closedReason: reason },
     })
 
-    await interaction.editReply(await userInfoMessage(interaction, "closed"))
-    const channel = await fetchChannel(thread.id, ChannelType.PublicThread)
-    if (reason) {
-      await channel.setName(`${channel.name} (${reason})`)
-    }
+    const message = await threadStatusMessage(interaction, "closed")
+    await interaction.editReply(message)
 
+    const channel = await fetchChannel(thread.id, ChannelType.PublicThread)
+    await channel.setName(`${channel.name} (${reason ?? "closed"})`)
     await channel.setLocked(true)
     await channel.setArchived(true)
 
-    await Discord.users.send(
-      thread.userId,
-      await userInfoMessage(interaction, "closed")
-    )
+    await Discord.users.send(thread.userId, message)
   }
 }

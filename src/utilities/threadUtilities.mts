@@ -1,18 +1,14 @@
 import { Discord, Prisma } from "../clients.mjs"
-import { NoTargetUserError, ThreadAlreadyExistsError } from "../errors.mjs"
 import { dmsDisabledMessage } from "../messages/dmsDisabledMessage.mjs"
 import { memberLeftMessage } from "../messages/memberLeftMessage.mjs"
 import { receivedMessage } from "../messages/receivedMessage.mjs"
 import { sentMessage } from "../messages/sentMessage.mjs"
 import { staffInfoMessage } from "../messages/staffInfoMessage.mjs"
-import { userInfoMessage } from "../messages/userInfoMessage.mjs"
+import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
 import { DefaultConfig } from "../models/config.mjs"
 import { fetchChannel, tryFetchMember } from "./discordUtilities.mjs"
 import type { Thread } from "@prisma/client"
-import type {
-  ChatInputCommandInteraction,
-  UserContextMenuCommandInteraction,
-} from "discord.js"
+import type { CommandInteraction, GuildMember } from "discord.js"
 import {
   ChannelType,
   DiscordAPIError,
@@ -73,32 +69,15 @@ export async function createThreadFromMessage(message: Message) {
     },
   })
 
-  await member.send(await userInfoMessage(message, "opened"))
+  await member.send(await threadStatusMessage(message, "opened"))
 
   return thread
 }
 
 export async function createThreadFromInteraction(
-  interaction: ChatInputCommandInteraction | UserContextMenuCommandInteraction
+  member: GuildMember,
+  interaction: CommandInteraction
 ) {
-  let user
-  if (interaction.isUserContextMenuCommand()) {
-    user = interaction.targetUser
-  } else if (interaction.isChatInputCommand()) {
-    user = interaction.options.getUser("user", true)
-  } else {
-    throw new NoTargetUserError()
-  }
-
-  const member = await guild.members.fetch(user)
-
-  let thread = await Prisma.thread.findFirst({
-    where: { userId: user.id, active: true },
-  })
-  if (thread) {
-    throw new ThreadAlreadyExistsError(thread, member)
-  }
-
   const channel = await mailForum.threads.create({
     name: member.user.tag,
     message: await staffInfoMessage(member),
@@ -111,7 +90,7 @@ export async function createThreadFromInteraction(
     await channel.members.add(staffMember.id)
   }
 
-  thread = await Prisma.thread.create({
+  const thread = await Prisma.thread.create({
     data: {
       id: channel.id,
       userId: member.id,
@@ -122,7 +101,7 @@ export async function createThreadFromInteraction(
   })
 
   try {
-    await user.send(await userInfoMessage(interaction, "opened"))
+    await member.send(await threadStatusMessage(interaction, "opened"))
   } catch (e) {
     if (
       !(e instanceof DiscordAPIError) ||

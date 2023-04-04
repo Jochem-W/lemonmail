@@ -10,25 +10,27 @@ export async function threadStatusMessage(
   data: CommandInteraction | Message,
   type: "closed" | "opened"
 ) {
-  const author = data instanceof Message ? data.author : data.user
-  const member = await guild.members.fetch(author)
   const footer: EmbedFooterOptions = { text: guild.name }
   const iconURL = guild.iconURL()
   if (iconURL) {
     footer.iconURL = iconURL
   }
 
+  const embed = new EmbedBuilder()
+    .setTitle(`Thread ${type}`)
+    .setFooter(footer)
+    .setTimestamp(data.createdTimestamp)
+    .setColor(type === "opened" ? 0x0040ff : 0xff0000)
+
+  if (data instanceof CommandInteraction) {
+    const member = await guild.members.fetch(data.user.id)
+    embed.setAuthor({
+      name: formatName(member),
+      iconURL: member.displayAvatarURL(),
+    })
+  }
+
   return {
-    embeds: [
-      new EmbedBuilder()
-        .setAuthor({
-          name: formatName(member),
-          iconURL: member.displayAvatarURL(),
-        })
-        .setTitle(`Thread ${type}`)
-        .setFooter(footer)
-        .setTimestamp(data.createdTimestamp)
-        .setColor(type === "opened" ? 0x0040ff : 0xff2020),
-    ],
+    embeds: [embed],
   }
 }

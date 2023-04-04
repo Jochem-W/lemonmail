@@ -1,8 +1,11 @@
 import { Prisma } from "../clients.mjs"
+import { RegisteredCommands } from "../commands.mjs"
+import { CommandNotFoundByNameError } from "../errors.mjs"
 import { formatName } from "../utilities/embedUtilities.mjs"
 import type { GuildMember } from "discord.js"
 import {
   channelMention,
+  chatInputApplicationCommandMention,
   EmbedBuilder,
   inlineCode,
   roleMention,
@@ -14,6 +17,17 @@ export async function staffInfoMessage(member: GuildMember) {
 
   const roles = [...member.roles.cache.values()]
 
+  let closeCommand
+  for (const [id, command] of RegisteredCommands) {
+    if (command.builder.name === "close") {
+      closeCommand = { id, command }
+    }
+  }
+
+  if (!closeCommand) {
+    throw new CommandNotFoundByNameError("close")
+  }
+
   return {
     embeds: [
       new EmbedBuilder()
@@ -23,10 +37,11 @@ export async function staffInfoMessage(member: GuildMember) {
         })
         .setTitle("New thread")
         .setDescription(
-          `Send a message in this thread to reply. Messages that are prefixed with ${inlineCode(
-            "/"
-          )} or ${inlineCode("=")} won't be sent. Use ${inlineCode(
-            "/close"
+          `Prefix a message with ${inlineCode(
+            "=send"
+          )} to reply. Use ${chatInputApplicationCommandMention(
+            closeCommand.command.builder.name,
+            closeCommand.id
           )} to close the thread.`
         )
         .setFields(

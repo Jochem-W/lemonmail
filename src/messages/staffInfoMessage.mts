@@ -10,9 +10,7 @@ import {
 } from "discord.js"
 
 export async function staffInfoMessage(member: GuildMember) {
-  const threads = await Prisma.thread.findMany({
-    where: { userId: member.id },
-  })
+  const threads = await Prisma.thread.findMany({ where: { userId: member.id } })
 
   const roles = [...member.roles.cache.values()]
 

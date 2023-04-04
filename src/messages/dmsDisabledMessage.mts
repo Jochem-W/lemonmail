@@ -12,10 +12,7 @@ export function dmsDisabledMessage(member: GuildMember, message?: Message) {
     .setColor(0xff0000)
 
   if (!message) {
-    return {
-      embeds: [embed],
-      ephemeral: true,
-    }
+    return { embeds: [embed], ephemeral: true }
   }
 
   return {

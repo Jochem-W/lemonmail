@@ -34,7 +34,7 @@ export class ToggleAddCommand extends ChatInputCommand {
       })
     }
 
-    await interaction.reply({
+    await interaction.editReply({
       embeds: [
         new EmbedBuilder()
           .setAuthor({

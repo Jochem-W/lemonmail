@@ -1,3 +1,4 @@
+import { Prisma } from "../clients.mjs"
 import type { Handler } from "../types/handler.mjs"
 import {
   processDmMessage,
@@ -18,11 +19,23 @@ export class MessageCreateHandler implements Handler<"messageCreate"> {
       return
     }
 
-    if (message.inGuild()) {
-      await processGuildMessage(message)
+    if (!message.inGuild()) {
+      await processDmMessage(message)
       return
     }
 
-    await processDmMessage(message)
+    if (message.content.startsWith("=") || message.content.startsWith("/")) {
+      return
+    }
+
+    const thread = await Prisma.thread.findFirst({
+      where: { id: message.channelId, active: true },
+    })
+
+    if (!thread) {
+      return
+    }
+
+    await processGuildMessage(thread, message)
   }
 }

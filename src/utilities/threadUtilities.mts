@@ -8,6 +8,7 @@ import { staffInfoMessage } from "../messages/staffInfoMessage.mjs"
 import { userInfoMessage } from "../messages/userInfoMessage.mjs"
 import { DefaultConfig } from "../models/config.mjs"
 import { fetchChannel, tryFetchMember } from "./discordUtilities.mjs"
+import type { Thread } from "@prisma/client"
 import type {
   ChatInputCommandInteraction,
   UserContextMenuCommandInteraction,
@@ -136,19 +137,7 @@ export async function createThreadFromInteraction(
   return thread
 }
 
-export async function processGuildMessage(message: Message) {
-  if (message.content.startsWith("=") || message.content.startsWith("/")) {
-    return
-  }
-
-  const thread = await Prisma.thread.findFirst({
-    where: { id: message.channelId, active: true },
-  })
-
-  if (!thread) {
-    return
-  }
-
+export async function processGuildMessage(thread: Thread, message: Message) {
   const member = await tryFetchMember(thread.userId)
   if (!member) {
     await message.channel.send(memberLeftMessage(thread, message))

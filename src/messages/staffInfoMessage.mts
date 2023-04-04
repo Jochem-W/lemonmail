@@ -38,9 +38,9 @@ export async function staffInfoMessage(member: GuildMember) {
         })
         .setTitle("New thread")
         .setDescription(
-          `Prefix a message with "${inlineCode(
+          `Prefix a message with ${inlineCode(
             DefaultConfig.sendPrefix.trim()
-          )}" to reply. Use ${chatInputApplicationCommandMention(
+          )} to reply. Use ${chatInputApplicationCommandMention(
             closeCommand.command.builder.name,
             closeCommand.id
           )} to close the thread.`

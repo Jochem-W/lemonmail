@@ -1,8 +1,10 @@
 import { Prisma } from "../clients.mjs"
 import { confirmationMessage } from "../messages/confirmationMessage.mjs"
-import { DefaultConfig } from "../models/config.mjs"
 import type { Handler } from "../types/handler.mjs"
 import {
+  checkMessageAuthor,
+  checkMessageContent,
+  checkMessagePrefix,
   processDmMessage,
   processGuildMessage,
 } from "../utilities/threadUtilities.mjs"
@@ -13,11 +15,7 @@ export class MessageCreateHandler implements Handler<"messageCreate"> {
   public readonly once = false
 
   public async handle(message: Message) {
-    if (message.author.bot || message.system) {
-      return
-    }
-
-    if (!message.content && message.attachments.size === 0) {
+    if (!checkMessageAuthor(message) || !checkMessageContent(message)) {
       return
     }
 
@@ -39,11 +37,11 @@ export class MessageCreateHandler implements Handler<"messageCreate"> {
       where: { id: message.channelId, active: true },
     })
 
-    if (!message.content.startsWith(DefaultConfig.sendPrefix)) {
+    if (!thread) {
       return
     }
 
-    if (!thread) {
+    if (!checkMessagePrefix(message)) {
       return
     }
 

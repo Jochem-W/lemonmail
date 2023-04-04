@@ -2,6 +2,9 @@ import { Prisma } from "../clients.mjs"
 import type { Handler } from "../types/handler.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
 import {
+  checkMessageAuthor,
+  checkMessageContent,
+  checkMessagePrefix,
   processDmMessage,
   processGuildMessage,
 } from "../utilities/threadUtilities.mjs"
@@ -28,10 +31,6 @@ export class RestartHandler implements Handler<"ready"> {
         limit: 100,
         after: thread.lastMessage,
       })) {
-        if (message.author.bot || message.system) {
-          continue
-        }
-
         messages.push(message)
       }
 
@@ -39,10 +38,6 @@ export class RestartHandler implements Handler<"ready"> {
         limit: 100,
         after: thread.lastMessage,
       })) {
-        if (message.author.bot || message.system) {
-          continue
-        }
-
         messages.push(message)
       }
 
@@ -61,7 +56,15 @@ export class RestartHandler implements Handler<"ready"> {
       })
 
       for (const message of messages) {
+        if (!checkMessageAuthor(message) || !checkMessageContent(message)) {
+          continue
+        }
+
         if (message.inGuild()) {
+          if (!checkMessagePrefix(message)) {
+            continue
+          }
+
           await processGuildMessage(thread, message)
           continue
         }

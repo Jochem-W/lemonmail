@@ -179,3 +179,15 @@ export async function processDmMessage(message: Message) {
     data: { lastMessage: message.id },
   })
 }
+
+export function checkMessageContent(message: Message) {
+  return message.content || message.attachments.size !== 0
+}
+
+export function checkMessageAuthor(message: Message) {
+  return !message.author.bot && !message.system
+}
+
+export function checkMessagePrefix(message: Message) {
+  return message.content.startsWith(DefaultConfig.sendPrefix)
+}

@@ -14,6 +14,10 @@ export class MessageCreateHandler implements Handler<"messageCreate"> {
       return
     }
 
+    if (!message.content && message.attachments.size === 0) {
+      return
+    }
+
     if (message.inGuild()) {
       await processGuildMessage(message)
       return

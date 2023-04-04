@@ -20,7 +20,7 @@ import { MIMEType } from "util"
 
 const guild = await Discord.guilds.fetch(DefaultConfig.guild.id)
 const mailForum = await fetchChannel(
-  DefaultConfig.guild.mailCategory,
+  DefaultConfig.guild.mailForum,
   ChannelType.GuildForum
 )
 

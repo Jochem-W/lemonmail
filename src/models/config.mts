@@ -8,7 +8,7 @@ type RawConfig = {
   guild: {
     errorChannel: string
     id: string
-    mailCategory: string
+    mailForum: string
     restart: {
       channel: string
       user?: string
@@ -37,13 +37,13 @@ class BotConfig {
 class GuildConfig {
   public readonly errorChannel: Snowflake
   public readonly id: Snowflake
-  public readonly mailCategory: Snowflake
+  public readonly mailForum: Snowflake
   public readonly restart: GuildRestartConfig
 
   public constructor(data: RawConfig["guild"]) {
     this.errorChannel = data.errorChannel
     this.id = data.id
-    this.mailCategory = data.mailCategory
+    this.mailForum = data.mailForum
     this.restart = new GuildRestartConfig(data.restart)
   }
 }

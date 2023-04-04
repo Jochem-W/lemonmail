@@ -1,4 +1,5 @@
 import { Prisma } from "../clients.mjs"
+import { confirmationMessage } from "../messages/confirmationMessage.mjs"
 import { DefaultConfig } from "../models/config.mjs"
 import type { Handler } from "../types/handler.mjs"
 import {
@@ -21,17 +22,26 @@ export class MessageCreateHandler implements Handler<"messageCreate"> {
     }
 
     if (!message.inGuild()) {
-      await processDmMessage(message)
-      return
-    }
+      const thread = await Prisma.thread.findFirst({
+        where: { userId: message.author.id, active: true },
+      })
 
-    if (!message.content.startsWith(DefaultConfig.sendPrefix)) {
+      if (!thread) {
+        await message.reply(confirmationMessage(message))
+        return
+      }
+
+      await processDmMessage(message)
       return
     }
 
     const thread = await Prisma.thread.findFirst({
       where: { id: message.channelId, active: true },
     })
+
+    if (!message.content.startsWith(DefaultConfig.sendPrefix)) {
+      return
+    }
 
     if (!thread) {
       return

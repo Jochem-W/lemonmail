@@ -94,15 +94,3 @@ export async function ensureOwner(interaction: Interaction) {
     throw new OwnerOnlyError()
   }
 }
-
-export function isInPrivateChannel(interaction: Interaction) {
-  if (!interaction.inGuild()) {
-    return false
-  }
-
-  if (!interaction.channelId) {
-    return false
-  }
-
-  return DefaultConfig.guild.privateChannels.includes(interaction.channelId)
-}

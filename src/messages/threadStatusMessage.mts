@@ -28,7 +28,7 @@ export async function threadStatusMessage(
         .setTitle(`Thread ${type}`)
         .setFooter(footer)
         .setTimestamp(data.createdTimestamp)
-        .setColor(type === "opened" ? 0x0080ff : 0xff4040),
+        .setColor(type === "opened" ? 0x0040ff : 0xff2020),
     ],
   }
 }

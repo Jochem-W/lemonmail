@@ -9,7 +9,7 @@ import type { EmbedFooterOptions } from "discord.js"
 const guild = await Discord.guilds.fetch(DefaultConfig.guild.id)
 
 export async function sentMessage(message: Message) {
-  const colour = message.inGuild() ? 0xff8000 : 0x40ff40
+  const colour = message.inGuild() ? 0xff4000 : 0x20ff20
 
   const images = attachmentsToEmbeds(message, colour)
 

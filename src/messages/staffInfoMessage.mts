@@ -62,7 +62,7 @@ export async function staffInfoMessage(member: GuildMember) {
           }
         )
         .setTimestamp(new Date())
-        .setColor(0x0080ff),
+        .setColor(0x0040ff),
     ],
   }
 }

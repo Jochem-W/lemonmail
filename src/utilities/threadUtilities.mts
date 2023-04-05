@@ -48,7 +48,7 @@ export async function createThreadFromMessage(message: Message) {
   const member = await guild.members.fetch(message.author.id)
 
   const channel = await mailForum.threads.create({
-    name: member.user.tag,
+    name: `${member.user.tag} (${member.id})`,
     message: await staffInfoMessage(member),
   })
 
@@ -79,7 +79,7 @@ export async function createThreadFromInteraction(
   interaction: CommandInteraction
 ) {
   const channel = await mailForum.threads.create({
-    name: member.user.tag,
+    name: `${member.user.tag} (${member.id})`,
     message: await staffInfoMessage(member),
   })
 

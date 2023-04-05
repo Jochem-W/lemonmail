@@ -180,14 +180,14 @@ export async function processDmMessage(message: Message) {
   })
 }
 
-export function checkMessageContent(message: Message) {
+export function messageIsNotEmpty(message: Message) {
   return message.content || message.attachments.size !== 0
 }
 
-export function checkMessageAuthor(message: Message) {
+export function messageIsFromUser(message: Message) {
   return !message.author.bot && !message.system
 }
 
-export function checkMessagePrefix(message: Message) {
+export function messageHasSendPrefix(message: Message) {
   return message.content.startsWith(DefaultConfig.sendPrefix)
 }

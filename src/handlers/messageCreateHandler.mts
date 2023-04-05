@@ -2,9 +2,9 @@ import { Prisma } from "../clients.mjs"
 import { confirmationMessage } from "../messages/confirmationMessage.mjs"
 import type { Handler } from "../types/handler.mjs"
 import {
-  checkMessageAuthor,
-  checkMessageContent,
-  checkMessagePrefix,
+  messageIsFromUser,
+  messageIsNotEmpty,
+  messageHasSendPrefix,
   processDmMessage,
   processGuildMessage,
 } from "../utilities/threadUtilities.mjs"
@@ -15,7 +15,7 @@ export class MessageCreateHandler implements Handler<"messageCreate"> {
   public readonly once = false
 
   public async handle(message: Message) {
-    if (!checkMessageAuthor(message) || !checkMessageContent(message)) {
+    if (!messageIsFromUser(message) || !messageIsNotEmpty(message)) {
       return
     }
 
@@ -41,7 +41,7 @@ export class MessageCreateHandler implements Handler<"messageCreate"> {
       return
     }
 
-    if (!checkMessagePrefix(message)) {
+    if (!messageHasSendPrefix(message)) {
       return
     }
 

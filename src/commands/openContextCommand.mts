@@ -1,6 +1,7 @@
 import { Prisma } from "../clients.mjs"
 import { threadAlreadyExistsMessage } from "../messages/threadAlreadyExistsMessage.mjs"
 import { threadOpenedMessage } from "../messages/threadOpenedMessage.mjs"
+import { userIsBotMessage } from "../messages/userIsBotMessage.mjs"
 import { userNotInGuildMessage } from "../messages/userNotInGuildMessage.mjs"
 import { UserContextMenuCommand } from "../models/userContextMenuCommand.mjs"
 import { tryFetchMember } from "../utilities/discordUtilities.mjs"
@@ -19,6 +20,11 @@ export class OpenContextCommand extends UserContextMenuCommand {
     await interaction.deferReply({ ephemeral: true })
 
     const user = interaction.targetUser
+    if (user.bot) {
+      await interaction.editReply(userIsBotMessage(user))
+      return
+    }
+
     let thread = await Prisma.thread.findFirst({
       where: { userId: user.id, active: true },
     })

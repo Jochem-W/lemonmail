@@ -10,6 +10,7 @@ import { fetchChannel, tryFetchMember } from "./discordUtilities.mjs"
 import type { Thread } from "@prisma/client"
 import type { CommandInteraction, GuildMember } from "discord.js"
 import {
+  bold,
   ChannelType,
   DiscordAPIError,
   EmbedBuilder,
@@ -154,7 +155,7 @@ export async function processGuildMessage(
   })
 
   await message.channel.messages.edit(thread.id, {
-    content: `Sent message to ${message.author.tag}: ${
+    content: `➡️ ${bold(message.author.tag)}: ${
       message.content.replace(prefix, "") || "-"
     }`,
   })
@@ -190,9 +191,7 @@ export async function processDmMessage(message: Message) {
   })
 
   await channel.messages.edit(thread.id, {
-    content: `Received message from ${message.author.tag}: ${
-      message.content || "-"
-    }`,
+    content: `⬅️ ${bold(message.author.tag)}: ${message.content || "-"}`,
   })
 }
 

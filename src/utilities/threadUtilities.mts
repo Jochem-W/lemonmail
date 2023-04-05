@@ -189,5 +189,11 @@ export function messageIsFromUser(message: Message) {
 }
 
 export function messageHasSendPrefix(message: Message) {
-  return message.content.startsWith(DefaultConfig.sendPrefix)
+  for (const prefix of DefaultConfig.sendPrefixes) {
+    if (message.content.startsWith(prefix)) {
+      return true
+    }
+  }
+
+  return false
 }

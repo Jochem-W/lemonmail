@@ -13,6 +13,31 @@ import {
   userMention,
 } from "discord.js"
 
+function formatPrefixes() {
+  if (DefaultConfig.sendPrefixes.length === 0) {
+    return ""
+  }
+
+  if (
+    DefaultConfig.sendPrefixes.length === 1 &&
+    DefaultConfig.sendPrefixes[0]
+  ) {
+    return inlineCode(DefaultConfig.sendPrefixes[0].trim())
+  }
+
+  const commaSeparated = DefaultConfig.sendPrefixes
+    .slice(undefined, -1)
+    .map(inlineCode)
+    .join(", ")
+
+  const lastPrefix = DefaultConfig.sendPrefixes.at(-1)
+  if (!lastPrefix) {
+    return commaSeparated
+  }
+
+  return `${commaSeparated} or ${inlineCode(lastPrefix)}`
+}
+
 export async function staffInfoMessage(member: GuildMember) {
   const threads = await Prisma.thread.findMany({ where: { userId: member.id } })
 
@@ -38,9 +63,7 @@ export async function staffInfoMessage(member: GuildMember) {
         })
         .setTitle("New thread")
         .setDescription(
-          `Prefix a message with ${inlineCode(
-            DefaultConfig.sendPrefix.trim()
-          )} to reply. Use ${chatInputApplicationCommandMention(
+          `Prefix a message with ${formatPrefixes()} to reply. Use ${chatInputApplicationCommandMention(
             closeCommand.command.builder.name,
             closeCommand.id
           )} to close the thread.`

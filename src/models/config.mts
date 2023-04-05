@@ -23,7 +23,7 @@ type RawConfig = {
     name: string
     owner: string
   }
-  sendPrefix: string
+  sendPrefixes: string[]
 }
 
 class BotConfig {
@@ -87,14 +87,14 @@ class Config {
   public readonly guild: GuildConfig
   public readonly icons: IconsConfig
   public readonly repository: RepositoryConfig
-  public readonly sendPrefix: string
+  public readonly sendPrefixes: string[]
 
   private constructor(data: RawConfig) {
     this.bot = new BotConfig(data.bot)
     this.guild = new GuildConfig(data.guild)
     this.icons = new IconsConfig(data.icons)
     this.repository = new RepositoryConfig(data.repository)
-    this.sendPrefix = data.sendPrefix
+    this.sendPrefixes = data.sendPrefixes
   }
 
   public static async load() {

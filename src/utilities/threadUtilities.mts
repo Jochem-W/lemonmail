@@ -53,6 +53,8 @@ export async function createThreadFromMessage(message: Message) {
     message: await staffInfoMessage(member),
   })
 
+  await channel.messages.pin(channel.id)
+
   const staffMembers = await Prisma.staffMember.findMany({
     where: { addToThread: true },
   })
@@ -83,6 +85,8 @@ export async function createThreadFromInteraction(
     name: `${member.user.tag} (${member.id})`,
     message: await staffInfoMessage(member),
   })
+
+  await channel.messages.pin(channel.id)
 
   const staffMembers = await Prisma.staffMember.findMany({
     where: { addToThread: true },

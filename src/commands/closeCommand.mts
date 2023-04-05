@@ -45,11 +45,15 @@ export class CloseCommand extends ChatInputCommand {
       data: { active: false, closedReason: reason },
     })
 
-    const message = await threadStatusMessage(interaction, "closed")
-    await interaction.editReply(message)
+    await interaction.editReply(
+      await threadStatusMessage(interaction, "closed", reason ?? undefined)
+    )
 
     try {
-      await Discord.users.send(thread.userId, message)
+      await Discord.users.send(
+        thread.userId,
+        await threadStatusMessage(interaction, "closed")
+      )
     } catch (e) {
       if (
         !(e instanceof DiscordAPIError) ||

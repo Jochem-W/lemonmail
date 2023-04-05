@@ -154,7 +154,10 @@ export async function processGuildMessage(
   })
 
   await message.channel.messages.edit(thread.id, {
-    content: `${message.author.tag}: ${message.content.replace(prefix, "")}`,
+    content: `Sent message to ${message.author.tag}: ${message.content.replace(
+      prefix,
+      ""
+    )}`,
   })
 }
 
@@ -188,7 +191,7 @@ export async function processDmMessage(message: Message) {
   })
 
   await channel.messages.edit(thread.id, {
-    content: `${message.author.tag}: ${message.content}`,
+    content: `Received message from ${message.author.tag}: ${message.content}`,
   })
 }
 

@@ -51,15 +51,19 @@ export async function createThreadFromMessage(message: Message) {
   const channel = await mailForum.threads.create({
     name: `${member.user.tag} (${member.id})`,
     message: await staffInfoMessage(member),
+    reason: "Member sent a direct message to the bot",
   })
 
-  await channel.messages.pin(channel.id)
+  await channel.messages.pin(channel.id, "Make the message more easy to find")
 
   const staffMembers = await Prisma.staffMember.findMany({
     where: { addToThread: true },
   })
   for (const staffMember of staffMembers) {
-    await channel.members.add(staffMember.id)
+    await channel.members.add(
+      staffMember.id,
+      "Staff member has opted in to pings"
+    )
   }
 
   const thread = await Prisma.thread.create({
@@ -84,15 +88,19 @@ export async function createThreadFromInteraction(
   const channel = await mailForum.threads.create({
     name: `${member.user.tag} (${member.id})`,
     message: await staffInfoMessage(member),
+    reason: "Staff member manually opened a thread",
   })
 
-  await channel.messages.pin(channel.id)
+  await channel.messages.pin(channel.id, "Make the message more easy to find")
 
   const staffMembers = await Prisma.staffMember.findMany({
     where: { addToThread: true },
   })
   for (const staffMember of staffMembers) {
-    await channel.members.add(staffMember.id)
+    await channel.members.add(
+      staffMember.id,
+      "Staff member has opted in to pings"
+    )
   }
 
   const thread = await Prisma.thread.create({

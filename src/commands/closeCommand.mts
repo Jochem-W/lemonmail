@@ -64,8 +64,11 @@ export class CloseCommand extends ChatInputCommand {
     }
 
     const channel = await fetchChannel(thread.id, ChannelType.PublicThread)
-    await channel.setName(`${channel.name} (${reason ?? "closed"})`)
-    await channel.setLocked(true)
-    await channel.setArchived(true)
+    await channel.setName(
+      `${channel.name} (${reason ?? "closed"})`,
+      "Thread was closed manually"
+    )
+    await channel.setLocked(true, "Thread was closed manually")
+    await channel.setArchived(true, "Thread was closed manually")
   }
 }

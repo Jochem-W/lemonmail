@@ -152,6 +152,10 @@ export async function processGuildMessage(
     where: { id: thread.id },
     data: { lastMessage: message.id },
   })
+
+  await message.channel.messages.edit(thread.id, {
+    content: `${message.author.tag}: ${message.content.replace(prefix, "")}`,
+  })
 }
 
 export async function processDmMessage(message: Message) {
@@ -181,6 +185,10 @@ export async function processDmMessage(message: Message) {
   await Prisma.thread.update({
     where: { id: thread.id },
     data: { lastMessage: message.id },
+  })
+
+  await channel.messages.edit(thread.id, {
+    content: `${message.author.tag}: ${message.content}`,
   })
 }
 

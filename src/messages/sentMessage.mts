@@ -8,7 +8,7 @@ import type { EmbedFooterOptions } from "discord.js"
 
 const guild = await Discord.guilds.fetch(DefaultConfig.guild.id)
 
-export async function sentMessage(message: Message) {
+export async function sentMessage(message: Message, prefix?: string) {
   const colour = message.inGuild() ? 0xff4000 : 0x20ff20
 
   const images = attachmentsToEmbeds(message, colour)
@@ -23,7 +23,7 @@ export async function sentMessage(message: Message) {
   embed
     .setTitle("Message sent")
     .setDescription(
-      message.content.replace(DefaultConfig.sendPrefix, "") || null
+      (prefix ? message.content.replace(prefix, "") : message.content) || null
     )
     .setTimestamp(message.createdTimestamp)
     .setColor(colour)

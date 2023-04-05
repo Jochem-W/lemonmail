@@ -41,10 +41,11 @@ export class MessageCreateHandler implements Handler<"messageCreate"> {
       return
     }
 
-    if (!messageHasSendPrefix(message)) {
+    const prefix = messageHasSendPrefix(message)
+    if (prefix === false) {
       return
     }
 
-    await processGuildMessage(thread, message)
+    await processGuildMessage(thread, message, prefix)
   }
 }

@@ -61,11 +61,12 @@ export class RestartHandler implements Handler<"ready"> {
         }
 
         if (message.inGuild()) {
-          if (!messageHasSendPrefix(message)) {
+          const prefix = messageHasSendPrefix(message)
+          if (prefix === false) {
             continue
           }
 
-          await processGuildMessage(thread, message)
+          await processGuildMessage(thread, message, prefix)
           continue
         }
 

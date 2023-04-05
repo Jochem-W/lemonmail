@@ -116,7 +116,11 @@ export async function createThreadFromInteraction(
   return thread
 }
 
-export async function processGuildMessage(thread: Thread, message: Message) {
+export async function processGuildMessage(
+  thread: Thread,
+  message: Message,
+  prefix: string
+) {
   const member = await tryFetchMember(thread.userId)
   if (!member) {
     await message.channel.send(memberLeftMessage(thread, message))
@@ -124,7 +128,7 @@ export async function processGuildMessage(thread: Thread, message: Message) {
   }
 
   try {
-    await member.send(await receivedMessage(message))
+    await member.send(await receivedMessage(message, prefix))
   } catch (e) {
     if (
       !(e instanceof DiscordAPIError) ||
@@ -141,7 +145,7 @@ export async function processGuildMessage(thread: Thread, message: Message) {
     return
   }
 
-  await message.channel.send(await sentMessage(message))
+  await message.channel.send(await sentMessage(message, prefix))
   await message.delete()
 
   await Prisma.thread.update({
@@ -191,7 +195,7 @@ export function messageIsFromUser(message: Message) {
 export function messageHasSendPrefix(message: Message) {
   for (const prefix of DefaultConfig.sendPrefixes) {
     if (message.content.startsWith(prefix)) {
-      return true
+      return prefix
     }
   }
 

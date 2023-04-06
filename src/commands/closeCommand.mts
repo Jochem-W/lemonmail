@@ -4,6 +4,7 @@ import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
 import { ChatInputCommand } from "../models/chatInputCommand.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
 import {
+  bold,
   ChannelType,
   ChatInputCommandInteraction,
   DiscordAPIError,
@@ -64,6 +65,9 @@ export class CloseCommand extends ChatInputCommand {
     }
 
     const channel = await fetchChannel(thread.id, ChannelType.PublicThread)
+    await channel.messages.edit(channel.id, {
+      content: `${bold(interaction.user.tag)}: [thread closed]`,
+    })
     await channel.setName(
       `${channel.name} (${reason ?? "closed"})`,
       "Thread was closed manually"

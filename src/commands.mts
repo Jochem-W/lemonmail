@@ -1,7 +1,7 @@
 import { CloseCommand } from "./commands/closeCommand.mjs"
 import { OpenCommand } from "./commands/openCommand.mjs"
 import { OpenContextCommand } from "./commands/openContextCommand.mjs"
-import { ToggleAddCommand } from "./commands/toggleAddCommand.mjs"
+import { ThreadAutoAddCommand } from "./commands/threadAutoAddCommand.mjs"
 import type { ChatInputCommand } from "./models/chatInputCommand.mjs"
 import type { MessageContextMenuCommand } from "./models/messageContextMenuCommand.mjs"
 import type { UserContextMenuCommand } from "./models/userContextMenuCommand.mjs"
@@ -12,7 +12,7 @@ import type { Snowflake } from "discord.js"
 export const SlashCommands: ChatInputCommand[] = [
   new CloseCommand(),
   new OpenCommand(),
-  new ToggleAddCommand(),
+  new ThreadAutoAddCommand(),
 ]
 
 export const MessageContextMenuCommands: MessageContextMenuCommand[] = []

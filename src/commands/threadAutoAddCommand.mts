@@ -7,10 +7,10 @@ import {
   PermissionFlagsBits,
 } from "discord.js"
 
-export class ToggleAddCommand extends ChatInputCommand {
+export class ThreadAutoAddCommand extends ChatInputCommand {
   public constructor() {
     super(
-      "toggle-add",
+      "thread-auto-add",
       "Toggles whether you want to be added to new ModMail threads",
       PermissionFlagsBits.ModerateMembers
     )

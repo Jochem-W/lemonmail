@@ -217,7 +217,10 @@ export function messageIsFromUser(message: Message) {
 
 export function messageHasSendPrefix(message: Message) {
   for (const prefix of DefaultConfig.sendPrefixes) {
-    if (message.content.startsWith(prefix)) {
+    if (
+      message.content.startsWith(`${prefix} `) ||
+      (message.content === prefix && message.attachments.size !== 0)
+    ) {
       return prefix
     }
   }

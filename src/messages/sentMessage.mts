@@ -23,7 +23,8 @@ export async function sentMessage(message: Message, prefix?: string) {
   embed
     .setTitle("Message sent")
     .setDescription(
-      (prefix ? message.content.replace(prefix, "") : message.content) || null
+      (prefix ? message.content.replace(prefix, "").trim() : message.content) ||
+        null
     )
     .setTimestamp(message.createdTimestamp)
     .setColor(colour)

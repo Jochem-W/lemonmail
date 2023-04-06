@@ -73,7 +73,8 @@ export async function staffInfoMessage(member: GuildMember) {
           { name: "User ID", value: member.id },
           {
             name: "Previous threads",
-            value: threads.map((t) => channelMention(t.id)).join("\n") || "-",
+            value:
+              threads.map((t) => channelMention(t.id)).join("\n") || "None",
           },
           {
             name: "Roles",
@@ -81,7 +82,7 @@ export async function staffInfoMessage(member: GuildMember) {
               roles
                 .filter((r) => r.id !== member.guild.roles.everyone.id)
                 .map((r) => roleMention(r.id))
-                .join("\n") || "-",
+                .join("\n") || "None",
           }
         )
         .setTimestamp(new Date())

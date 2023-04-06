@@ -167,7 +167,7 @@ export async function processGuildMessage(
   })
 
   await message.channel.messages.edit(thread.id, {
-    content: `➡️ ${bold(message.author.tag)}: ${
+    content: `📤 ${bold(message.author.tag)}: ${
       message.content.replace(prefix, "") || "-"
     }`,
   })
@@ -203,7 +203,7 @@ export async function processDmMessage(message: Message) {
   })
 
   await channel.messages.edit(thread.id, {
-    content: `⬅️ ${bold(message.author.tag)}: ${message.content || "-"}`,
+    content: `📥 ${bold(message.author.tag)}: ${message.content || "-"}`,
   })
 }
 

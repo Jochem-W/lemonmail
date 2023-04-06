@@ -14,7 +14,7 @@ export async function sentMessage(message: Message, prefix?: string) {
   const images = attachmentsToEmbeds(message, colour)
 
   let embed
-  if (images.length === 10) {
+  if (images.length === 10 || images.length === 1) {
     embed = images.shift() as EmbedBuilder
   } else {
     embed = new EmbedBuilder()

@@ -21,7 +21,7 @@ export async function receivedMessage(message: Message, prefix?: string) {
   }
 
   let embed
-  if (images.length === 10) {
+  if (images.length === 10 || images.length === 1) {
     embed = images.shift() as EmbedBuilder
   } else {
     embed = new EmbedBuilder()

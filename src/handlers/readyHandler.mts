@@ -19,6 +19,8 @@ export class ReadyHandler implements Handler<"ready"> {
   public async handle(client: Client<true>) {
     console.log(`Running as: ${client.user.tag}`)
 
+    client.user.setActivity({ name: "DM to contact staff!" })
+
     let title = "Bot "
     switch (await getState()) {
       case "UP":

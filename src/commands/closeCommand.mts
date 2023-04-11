@@ -2,12 +2,14 @@ import { Discord, Prisma } from "../clients.mjs"
 import { invalidThreadMessage } from "../messages/invalidThreadMessage.mjs"
 import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
 import { ChatInputCommand } from "../models/chatInputCommand.mjs"
+import { DefaultConfig } from "../models/config.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
 import {
   bold,
   ChannelType,
   ChatInputCommandInteraction,
   DiscordAPIError,
+  EmbedBuilder,
   PermissionFlagsBits,
   RESTJSONErrorCodes,
 } from "discord.js"
@@ -40,7 +42,32 @@ export class CloseCommand extends ChatInputCommand {
       return
     }
 
+    const channel = await fetchChannel(thread.id, ChannelType.PublicThread)
+    const newName = `${channel.name} (${reason ?? "closed"})`
+    if (newName.length > 100) {
+      await interaction.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setAuthor({
+              name: "Reason too long",
+              iconURL: DefaultConfig.icons.fail.toString(),
+            })
+            .setDescription(
+              `The reason "${
+                reason ?? ""
+              }" is too long, please reduce it to be at most ${
+                100 - newName.length + (reason?.length ?? 0)
+              } characters long`
+            )
+            .setColor(0xff0000),
+        ],
+        ephemeral: true,
+      })
+      return
+    }
+
     await interaction.deferReply()
+
     await Prisma.thread.update({
       where: { id: thread.id },
       data: { active: false, closedReason: reason },
@@ -64,7 +91,6 @@ export class CloseCommand extends ChatInputCommand {
       }
     }
 
-    const channel = await fetchChannel(thread.id, ChannelType.PublicThread)
     await channel.messages.edit(channel.id, {
       content: `${bold(interaction.user.tag)}: [thread closed]`,
     })

@@ -1,7 +1,10 @@
 import { Discord } from "../clients.mjs"
 import { DefaultConfig } from "../models/config.mjs"
 import { formatName } from "../utilities/embedUtilities.mjs"
-import { attachmentsToEmbeds } from "../utilities/threadUtilities.mjs"
+import {
+  attachmentsToEmbeds,
+  renameAttachments,
+} from "../utilities/threadUtilities.mjs"
 import type { Message } from "discord.js"
 import { EmbedBuilder } from "discord.js"
 import type { EmbedFooterOptions } from "discord.js"
@@ -47,6 +50,6 @@ export async function sentMessage(message: Message, prefix?: string) {
 
   return {
     embeds: [embed, ...images],
-    files: [...message.attachments.values()],
+    files: await renameAttachments(message),
   }
 }

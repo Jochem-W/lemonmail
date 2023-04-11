@@ -10,6 +10,7 @@ import { fetchChannel, tryFetchMember } from "./discordUtilities.mjs"
 import type { Thread } from "@prisma/client"
 import type { CommandInteraction, GuildMember } from "discord.js"
 import {
+  AttachmentBuilder,
   bold,
   ChannelType,
   DiscordAPIError,
@@ -17,6 +18,7 @@ import {
   Message,
   RESTJSONErrorCodes,
 } from "discord.js"
+import { Stream } from "stream"
 import { MIMEType } from "util"
 
 const guild = await Discord.guilds.fetch(DefaultConfig.guild.id)
@@ -36,7 +38,7 @@ export function attachmentsToEmbeds(message: Message, colour?: number) {
     if (mimeType.type === "image") {
       embeds.push(
         new EmbedBuilder()
-          .setImage(`attachment://${attachment.name}`)
+          .setImage(`attachment://${attachment.id}_${attachment.name}`)
           .setColor(colour ?? null)
       )
     }
@@ -207,6 +209,17 @@ export async function processDmMessage(message: Message) {
       message.content || "[no text content]"
     }`,
   })
+}
+
+export async function renameAttachments(message: Message) {
+  return await Promise.all(
+    message.attachments.map(async (a) => {
+      const response = await fetch(a.url)
+      return new AttachmentBuilder(response.body as unknown as Stream).setName(
+        `${a.id}_${a.name}`
+      )
+    })
+  )
 }
 
 export function messageIsNotEmpty(message: Message) {

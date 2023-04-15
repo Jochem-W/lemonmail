@@ -13,6 +13,12 @@ type RawConfig = {
       channel: string
       user?: string
     }
+    tags: {
+      awaitingStaff: string
+      awaitingUser: string
+      closed: string
+      open: string
+    }
   }
   icons: {
     fail: string
@@ -39,12 +45,14 @@ class GuildConfig {
   public readonly id: Snowflake
   public readonly mailForum: Snowflake
   public readonly restart: GuildRestartConfig
+  public readonly tags: GuildTagsConfig
 
   public constructor(data: RawConfig["guild"]) {
     this.errorChannel = data.errorChannel
     this.id = data.id
     this.mailForum = data.mailForum
     this.restart = new GuildRestartConfig(data.restart)
+    this.tags = new GuildTagsConfig(data.tags)
   }
 }
 
@@ -57,6 +65,20 @@ class GuildRestartConfig {
     if (data.user) {
       this.user = data.user
     }
+  }
+}
+
+class GuildTagsConfig {
+  public readonly awaitingStaff: Snowflake
+  public readonly awaitingUser: Snowflake
+  public readonly closed: Snowflake
+  public readonly open: Snowflake
+
+  public constructor(data: RawConfig["guild"]["tags"]) {
+    this.awaitingStaff = data.awaitingStaff
+    this.awaitingUser = data.awaitingUser
+    this.closed = data.closed
+    this.open = data.open
   }
 }
 

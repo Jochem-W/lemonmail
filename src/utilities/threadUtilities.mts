@@ -54,6 +54,10 @@ export async function createThreadFromMessage(message: Message) {
     name: `${member.user.tag} ${member.id}`,
     message: await staffInfoMessage(member),
     reason: "Member sent a direct message to the bot",
+    appliedTags: [
+      DefaultConfig.guild.tags.open,
+      DefaultConfig.guild.tags.awaitingStaff,
+    ],
   })
 
   await channel.messages.pin(channel.id, "Make the message more easy to find")
@@ -91,6 +95,10 @@ export async function createThreadFromInteraction(
     name: `${member.user.tag} ${member.id}`,
     message: await staffInfoMessage(member),
     reason: "Staff member manually opened a thread",
+    appliedTags: [
+      DefaultConfig.guild.tags.open,
+      DefaultConfig.guild.tags.awaitingStaff,
+    ],
   })
 
   await channel.messages.pin(channel.id, "Make the message more easy to find")
@@ -173,6 +181,12 @@ export async function processGuildMessage(
       message.content.replace(prefix, "") || "[no text content]"
     }`,
   })
+  if (message.channel.isThread()) {
+    await message.channel.setAppliedTags([
+      DefaultConfig.guild.tags.open,
+      DefaultConfig.guild.tags.awaitingUser,
+    ])
+  }
 }
 
 export async function processDmMessage(message: Message) {
@@ -209,6 +223,10 @@ export async function processDmMessage(message: Message) {
       message.content || "[no text content]"
     }`,
   })
+  await channel.setAppliedTags([
+    DefaultConfig.guild.tags.open,
+    DefaultConfig.guild.tags.awaitingStaff,
+  ])
 }
 
 export async function renameAttachments(message: Message) {

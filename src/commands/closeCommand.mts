@@ -98,6 +98,10 @@ export class CloseCommand extends ChatInputCommand {
       `${channel.name} (${reason ?? "closed"})`,
       "Thread was closed manually"
     )
+    await channel.setAppliedTags(
+      [DefaultConfig.guild.tags.closed],
+      "Thread was closed manually"
+    )
     await channel.setLocked(true, "Thread was closed manually")
     await channel.setArchived(true, "Thread was closed manually")
   }

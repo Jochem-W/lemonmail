@@ -27,7 +27,7 @@ export class CloseCommand extends ChatInputCommand {
         .setDescription(
           "The reason for closing the thread, not sent to the user"
         )
-        .setRequired(true)
+        .setRequired(false)
     )
   }
 

@@ -82,7 +82,13 @@ export async function createThreadFromMessage(message: Message) {
     },
   })
 
-  await member.send(await threadStatusMessage(message, "opened"))
+  await member.send(
+    await threadStatusMessage(
+      message,
+      "opened",
+      "Any messages you send here will be automatically sent to staff."
+    )
+  )
 
   return thread
 }
@@ -124,7 +130,13 @@ export async function createThreadFromInteraction(
   })
 
   try {
-    await member.send(await threadStatusMessage(interaction, "opened"))
+    await member.send(
+      await threadStatusMessage(
+        interaction,
+        "opened",
+        "Any messages you send here will be automatically sent to staff."
+      )
+    )
   } catch (e) {
     if (
       !(e instanceof DiscordAPIError) ||

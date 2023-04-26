@@ -5,6 +5,7 @@ import { Client, GatewayIntentBits, Partials } from "discord.js"
 export const Discord = new Client({
   intents: [
     GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.DirectMessages,

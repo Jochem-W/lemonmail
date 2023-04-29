@@ -11,7 +11,7 @@ export class ThreadAutoAddCommand extends ChatInputCommand {
   public constructor() {
     super(
       "thread-auto-add",
-      "Toggles whether you want to be added to new ModMail threads",
+      "Toggles whether you want to be added to new modmail threads",
       PermissionFlagsBits.ModerateMembers
     )
   }
@@ -44,7 +44,7 @@ export class ThreadAutoAddCommand extends ChatInputCommand {
           .setDescription(
             `You will now ${
               !staffMember.addToThread ? "no longer" : ""
-            } be added to new ModMail threads`
+            } be added to new modmail threads`
           ),
       ],
     })

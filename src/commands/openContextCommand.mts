@@ -13,7 +13,7 @@ import {
 
 export class OpenContextCommand extends UserContextMenuCommand {
   public constructor() {
-    super("Open ModMail thread", PermissionFlagsBits.ModerateMembers)
+    super("Open modmail thread", PermissionFlagsBits.ModerateMembers)
   }
 
   public async handle(interaction: UserContextMenuCommandInteraction) {

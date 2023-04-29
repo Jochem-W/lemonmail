@@ -12,7 +12,7 @@ export class OpenCommand extends ChatInputCommand {
   public constructor() {
     super(
       "open",
-      "Open a ModMail thread for this user",
+      "Open a modmail thread for this user",
       PermissionFlagsBits.ModerateMembers
     )
     this.builder.addUserOption((builder) =>

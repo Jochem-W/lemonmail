@@ -1,4 +1,5 @@
 import { Prisma } from "../clients.mjs"
+import { blockedMessage } from "../messages/blockedMessage.mjs"
 import { dmThreadExistsMessage } from "../messages/dmThreadExistsMessage.mjs"
 import { registerButtonHandler } from "../utilities/button.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
@@ -36,6 +37,14 @@ export const createThreadButton = registerButtonHandler(
   async (interaction, [type, channelId, messageId]) => {
     if (!type || !channelId || !messageId || type === "no") {
       await disable(interaction)
+      return
+    }
+
+    const prismaUser = await Prisma.user.findFirst({
+      where: { id: interaction.user.id },
+    })
+    if (prismaUser?.blocked) {
+      await interaction.reply(blockedMessage())
       return
     }
 

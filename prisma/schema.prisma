@@ -28,3 +28,9 @@ model StaffMember {
 
   addToThread Boolean
 }
+
+model User {
+  id String @id
+
+  blocked Boolean
+}

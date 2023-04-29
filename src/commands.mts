@@ -1,3 +1,5 @@
+import { BlockCommand } from "./commands/blockCommand.mjs"
+import { BlockContextCommand } from "./commands/blockContextCommand.mjs"
 import { CloseCommand } from "./commands/closeCommand.mjs"
 import { OpenCommand } from "./commands/openCommand.mjs"
 import { OpenContextCommand } from "./commands/openContextCommand.mjs"
@@ -13,12 +15,14 @@ export const SlashCommands: ChatInputCommand[] = [
   new CloseCommand(),
   new OpenCommand(),
   new ThreadAutoAddCommand(),
+  new BlockCommand(),
 ]
 
 export const MessageContextMenuCommands: MessageContextMenuCommand[] = []
 
 export const UserContextMenuCommands: UserContextMenuCommand[] = [
   new OpenContextCommand(),
+  new BlockContextCommand(),
 ]
 
 export const RegisteredCommands = new Collection<

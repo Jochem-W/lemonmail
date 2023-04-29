@@ -35,6 +35,7 @@ export async function block(
           )} is now ${verb} from making new modmail threads`
         ),
     ],
+    ephemeral: true,
   })
 }
 

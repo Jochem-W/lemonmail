@@ -36,9 +36,9 @@ devDependencies:
   '@tsconfig/esm':
     specifier: ^1.0.3
     version: 1.0.3
-  '@tsconfig/node18':
-    specifier: ^2.0.1
-    version: 2.0.1
+  '@tsconfig/node20':
+    specifier: ^1.0.1
+    version: 1.0.1
   '@tsconfig/strictest':
     specifier: ^2.0.1
     version: 2.0.1
@@ -512,8 +512,8 @@ packages:
     resolution: {integrity: sha512-Gp56rIc3R8ab032nXMUitmc7YIb4nAi8DQ6Qt47tuL0Ssn9LIOm+o2FQmqPu3jX4z0TsqgzWwkmVygxcq+yHYg==}
     dev: true
 
-  /@tsconfig/node18@2.0.1:
-    resolution: {integrity: sha512-UqdfvuJK0SArA2CxhKWwwAWfnVSXiYe63bVpMutc27vpngCntGUZQETO24pEJ46zU6XM+7SpqYoMgcO3bM11Ew==}
+  /@tsconfig/node20@1.0.1:
+    resolution: {integrity: sha512-ovd+Yu8j7zgVXA3jRfLRXGknScbVwg9p+R9k4/0EVJzymxokkyoib2Hjt1A2hGK5qehqBIwV8NYvUF/rG+2+wQ==}
     dev: true
 
   /@tsconfig/strictest@2.0.1:

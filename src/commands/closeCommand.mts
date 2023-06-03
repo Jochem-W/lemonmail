@@ -48,10 +48,7 @@ export class CloseCommand extends ChatInputCommand {
       await interaction.reply({
         embeds: [
           new EmbedBuilder()
-            .setAuthor({
-              name: "Reason too long",
-              iconURL: DefaultConfig.icons.fail.toString(),
-            })
+            .setTitle("Reason too long")
             .setDescription(
               `The reason "${
                 reason ?? ""

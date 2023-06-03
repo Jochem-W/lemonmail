@@ -2,10 +2,15 @@ import { Discord } from "../clients.mjs"
 import { DefaultConfig } from "../models/config.mjs"
 import type { Handler } from "../types/handler.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
-import { makeEmbed } from "../utilities/embedUtilities.mjs"
 import { Variables } from "../variables.mjs"
 import { Octokit } from "@octokit/rest"
-import { ChannelType, Client, codeBlock, userMention } from "discord.js"
+import {
+  ChannelType,
+  Client,
+  codeBlock,
+  EmbedBuilder,
+  userMention,
+} from "discord.js"
 import type { MessageCreateOptions } from "discord.js"
 import { writeFileSync } from "fs"
 import { mkdir, readFile, writeFile } from "fs/promises"
@@ -41,12 +46,9 @@ export class ReadyHandler implements Handler<"ready"> {
 
     const options: MessageCreateOptions = {
       embeds: [
-        makeEmbed(
-          title,
-          DefaultConfig.icons.success,
-          undefined,
-          (await getChangelog()) ?? undefined
-        ),
+        new EmbedBuilder()
+          .setTitle(title)
+          .setDescription((await getChangelog()) ?? null),
       ],
     }
 

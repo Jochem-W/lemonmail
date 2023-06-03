@@ -1,13 +1,9 @@
-import { DefaultConfig } from "../models/config.mjs"
 import type { GuildMember, Message } from "discord.js"
 import { EmbedBuilder, userMention } from "discord.js"
 
 export function dmsDisabledMessage(member: GuildMember, message?: Message) {
   const embed = new EmbedBuilder()
-    .setAuthor({
-      name: "DMs disabled",
-      iconURL: DefaultConfig.icons.fail.toString(),
-    })
+    .setTitle("DMs disabled")
     .setDescription(`${userMention(member.id)} doesn't have their DMs enabled`)
     .setColor(0xff0000)
 

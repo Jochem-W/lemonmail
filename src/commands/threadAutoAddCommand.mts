@@ -1,6 +1,5 @@
 import { Prisma } from "../clients.mjs"
 import { ChatInputCommand } from "../models/chatInputCommand.mjs"
-import { DefaultConfig } from "../models/config.mjs"
 import {
   ChatInputCommandInteraction,
   EmbedBuilder,
@@ -37,10 +36,7 @@ export class ThreadAutoAddCommand extends ChatInputCommand {
     await interaction.editReply({
       embeds: [
         new EmbedBuilder()
-          .setAuthor({
-            name: "Settings updated",
-            iconURL: DefaultConfig.icons.success.toString(),
-          })
+          .setTitle("Settings updated")
           .setDescription(
             `You will now ${
               !staffMember.addToThread ? "no longer" : ""

@@ -20,11 +20,6 @@ type RawConfig = {
       open: string
     }
   }
-  icons: {
-    fail: string
-    success: string
-    warning: string
-  }
   repository: {
     name: string
     owner: string
@@ -82,18 +77,6 @@ class GuildTagsConfig {
   }
 }
 
-class IconsConfig {
-  public readonly fail: URL
-  public readonly success: URL
-  public readonly warning: URL
-
-  public constructor(data: RawConfig["icons"]) {
-    this.fail = new URL(data.fail)
-    this.success = new URL(data.success)
-    this.warning = new URL(data.warning)
-  }
-}
-
 class RepositoryConfig {
   public readonly name: string
   public readonly owner: string
@@ -107,14 +90,12 @@ class RepositoryConfig {
 class Config {
   public readonly bot: BotConfig
   public readonly guild: GuildConfig
-  public readonly icons: IconsConfig
   public readonly repository: RepositoryConfig
   public readonly sendPrefixes: string[]
 
   private constructor(data: RawConfig) {
     this.bot = new BotConfig(data.bot)
     this.guild = new GuildConfig(data.guild)
-    this.icons = new IconsConfig(data.icons)
     this.repository = new RepositoryConfig(data.repository)
     this.sendPrefixes = data.sendPrefixes
   }

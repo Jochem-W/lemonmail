@@ -15,8 +15,8 @@ dependencies:
     specifier: ^4.15.0
     version: 4.15.0(prisma@4.15.0)
   discord.js:
-    specifier: ^14.11.0
-    version: 14.11.0(bufferutil@4.0.7)(utf-8-validate@6.0.3)
+    specifier: 14.11.1-dev.1686398626-6c2242f.0
+    version: 14.11.1-dev.1686398626-6c2242f.0(bufferutil@4.0.7)(utf-8-validate@6.0.3)
 
 optionalDependencies:
   bufferutil:
@@ -855,8 +855,8 @@ packages:
     resolution: {integrity: sha512-bBhDWU3TF9KADxR/mHp1K4Bvu/LRtFQdGyBjADu4e66F3ZnD4kp12W/SJCttIaCcMXzPV3sfty6eDGRNRph51Q==}
     dev: false
 
-  /discord.js@14.11.0(bufferutil@4.0.7)(utf-8-validate@6.0.3):
-    resolution: {integrity: sha512-CkueWYFQ28U38YPR8HgsBR/QT35oPpMbEsTNM30Fs8loBIhnA4s70AwQEoy6JvLcpWWJO7GY0y2BUzZmuBMepQ==}
+  /discord.js@14.11.1-dev.1686398626-6c2242f.0(bufferutil@4.0.7)(utf-8-validate@6.0.3):
+    resolution: {integrity: sha512-KCLYvTCKR3T9WuXjcaIaLhSObLiiepJ8Z6fwSK1AZLpFzVKjJSO0HrSz3XRw/iFRf8iUz6Ryzpy4ZC4b/eTg2A==}
     engines: {node: '>=16.9.0'}
     dependencies:
       '@discordjs/builders': 1.6.3

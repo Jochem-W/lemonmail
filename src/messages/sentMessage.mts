@@ -1,6 +1,6 @@
 import { Discord } from "../clients.mjs"
 import { DefaultConfig } from "../models/config.mjs"
-import { formatName } from "../utilities/embedUtilities.mjs"
+import { displayName } from "../utilities/discordUtilities.mjs"
 import {
   attachmentsToEmbeds,
   renameAttachments,
@@ -35,7 +35,7 @@ export async function sentMessage(message: Message, prefix?: string) {
   if (message.inGuild()) {
     const member = await guild.members.fetch(message.author.id)
     embed.setAuthor({
-      name: formatName(member),
+      name: displayName(member),
       iconURL: member.displayAvatarURL(),
     })
   } else {

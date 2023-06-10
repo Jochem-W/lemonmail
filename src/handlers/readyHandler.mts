@@ -1,7 +1,7 @@
 import { Discord } from "../clients.mjs"
 import { DefaultConfig } from "../models/config.mjs"
 import type { Handler } from "../types/handler.mjs"
-import { fetchChannel } from "../utilities/discordUtilities.mjs"
+import { fetchChannel, uniqueName } from "../utilities/discordUtilities.mjs"
 import { Variables } from "../variables.mjs"
 import { Octokit } from "@octokit/rest"
 import {
@@ -22,7 +22,7 @@ export class ReadyHandler implements Handler<"ready"> {
   public readonly once = true
 
   public async handle(client: Client<true>) {
-    console.log(`Running as: ${client.user.tag}`)
+    console.log(`Running as: ${uniqueName(client.user)}`)
 
     client.user.setActivity({ name: "DM to contact staff!" })
 

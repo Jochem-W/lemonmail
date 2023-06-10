@@ -6,7 +6,11 @@ import { sentMessage } from "../messages/sentMessage.mjs"
 import { staffInfoMessage } from "../messages/staffInfoMessage.mjs"
 import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
 import { DefaultConfig } from "../models/config.mjs"
-import { fetchChannel, tryFetchMember } from "./discordUtilities.mjs"
+import {
+  displayName,
+  fetchChannel,
+  tryFetchMember,
+} from "./discordUtilities.mjs"
 import type { Thread } from "@prisma/client"
 import type { CommandInteraction, GuildMember } from "discord.js"
 import {
@@ -51,7 +55,7 @@ export async function createThreadFromMessage(message: Message) {
   const member = await guild.members.fetch(message.author.id)
 
   const channel = await mailForum.threads.create({
-    name: `${member.user.tag} ${member.id}`,
+    name: `${displayName(member)} ${member.id}`,
     message: await staffInfoMessage(member),
     reason: "Member sent a direct message to the bot",
     appliedTags: [
@@ -98,7 +102,7 @@ export async function createThreadFromInteraction(
   interaction: CommandInteraction
 ) {
   const channel = await mailForum.threads.create({
-    name: `${member.user.tag} ${member.id}`,
+    name: `${displayName(member)} ${member.id}`,
     message: await staffInfoMessage(member),
     reason: "Staff member manually opened a thread",
     appliedTags: [
@@ -214,10 +218,10 @@ export async function processDmMessage(message: Message) {
 
   await channel.send(await receivedMessage(message))
 
+  const member = await tryFetchMember(message.author.id)
   try {
     await message.author.send(await sentMessage(message))
   } catch (e) {
-    const member = await tryFetchMember(message.author.id)
     if (!member) {
       await channel.send(memberLeftMessage(thread))
     } else {
@@ -231,7 +235,7 @@ export async function processDmMessage(message: Message) {
   })
 
   await channel.messages.edit(thread.id, {
-    content: `📥 ${bold(message.author.tag)}: ${
+    content: `📥 ${bold(displayName(member ?? message.author))}: ${
       message.content || "[no text content]"
     }`,
   })

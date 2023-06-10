@@ -3,7 +3,11 @@ import { invalidThreadMessage } from "../messages/invalidThreadMessage.mjs"
 import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
 import { ChatInputCommand } from "../models/chatInputCommand.mjs"
 import { DefaultConfig } from "../models/config.mjs"
-import { fetchChannel } from "../utilities/discordUtilities.mjs"
+import {
+  displayName,
+  fetchChannel,
+  tryFetchMember,
+} from "../utilities/discordUtilities.mjs"
 import {
   bold,
   ChannelType,
@@ -89,7 +93,11 @@ export class CloseCommand extends ChatInputCommand {
     }
 
     await channel.messages.edit(channel.id, {
-      content: `${bold(interaction.user.tag)}: [thread closed]`,
+      content: `${bold(
+        displayName(
+          (await tryFetchMember(interaction.user)) ?? interaction.user
+        )
+      )}: [thread closed]`,
     })
     await channel.setName(
       `${channel.name} (${reason ?? "closed"})`,

@@ -1,6 +1,6 @@
 import { Discord } from "../clients.mjs"
 import { DefaultConfig } from "../models/config.mjs"
-import { formatName } from "../utilities/embedUtilities.mjs"
+import { displayName } from "../utilities/discordUtilities.mjs"
 import { CommandInteraction, EmbedBuilder, Message } from "discord.js"
 import type { EmbedFooterOptions } from "discord.js"
 
@@ -30,7 +30,7 @@ export async function threadStatusMessage(
   if (data instanceof CommandInteraction) {
     const member = await guild.members.fetch(data.user.id)
     embed.setAuthor({
-      name: formatName(member),
+      name: displayName(member),
       iconURL: member.displayAvatarURL(),
     })
   }

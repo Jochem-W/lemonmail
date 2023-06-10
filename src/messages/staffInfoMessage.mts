@@ -2,7 +2,7 @@ import { Prisma } from "../clients.mjs"
 import { RegisteredCommands } from "../commands.mjs"
 import { CommandNotFoundByNameError } from "../errors.mjs"
 import { DefaultConfig } from "../models/config.mjs"
-import { formatName } from "../utilities/embedUtilities.mjs"
+import { displayName } from "../utilities/discordUtilities.mjs"
 import type { GuildMember } from "discord.js"
 import {
   channelMention,
@@ -58,7 +58,7 @@ export async function staffInfoMessage(member: GuildMember) {
     embeds: [
       new EmbedBuilder()
         .setAuthor({
-          name: formatName(member),
+          name: displayName(member),
           iconURL: member.displayAvatarURL(),
         })
         .setTitle("New thread")

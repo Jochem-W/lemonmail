@@ -5,9 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@octokit/plugin-rest-endpoint-methods':
-    specifier: 7.1.3
-    version: 7.1.3(@octokit/core@4.2.1)
   '@octokit/rest':
     specifier: ^19.0.11
     version: 19.0.11
@@ -15,8 +12,8 @@ dependencies:
     specifier: ^4.15.0
     version: 4.15.0(prisma@4.15.0)
   discord.js:
-    specifier: 14.11.1-dev.1686398626-6c2242f.0
-    version: 14.11.1-dev.1686398626-6c2242f.0(bufferutil@4.0.7)(utf-8-validate@6.0.3)
+    specifier: 14.11.1-dev.1686485047-6c2242f.0
+    version: 14.11.1-dev.1686485047-6c2242f.0(bufferutil@4.0.7)(utf-8-validate@6.0.3)
 
 optionalDependencies:
   bufferutil:
@@ -33,9 +30,6 @@ optionalDependencies:
     version: 0.1.8
 
 devDependencies:
-  '@octokit/types':
-    specifier: 9.2.3
-    version: 9.2.3
   '@trivago/prettier-plugin-sort-imports':
     specifier: ^4.1.1
     version: 4.1.1(prettier@2.8.8)
@@ -49,8 +43,8 @@ devDependencies:
     specifier: ^2.0.1
     version: 2.0.1
   '@types/node':
-    specifier: ^20.2.6
-    version: 20.2.6
+    specifier: ^20.3.0
+    version: 20.3.0
   '@typescript-eslint/eslint-plugin':
     specifier: ^5.59.9
     version: 5.59.9(@typescript-eslint/parser@5.59.9)(eslint@8.42.0)(typescript@5.1.3)
@@ -342,7 +336,7 @@ packages:
       '@octokit/graphql': 5.0.6
       '@octokit/request': 6.2.5
       '@octokit/request-error': 3.0.3
-      '@octokit/types': 9.2.3
+      '@octokit/types': 9.3.1
       before-after-hook: 2.2.3
       universal-user-agent: 6.0.0
     transitivePeerDependencies:
@@ -353,7 +347,7 @@ packages:
     resolution: {integrity: sha512-5L4fseVRUsDFGR00tMWD/Trdeeihn999rTMGRMC1G/Ldi1uWlWJzI98H4Iak5DB/RVvQuyMYKqSK/R6mbSOQyg==}
     engines: {node: '>= 14'}
     dependencies:
-      '@octokit/types': 9.2.3
+      '@octokit/types': 9.3.1
       is-plain-object: 5.0.0
       universal-user-agent: 6.0.0
     dev: false
@@ -363,14 +357,15 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       '@octokit/request': 6.2.5
-      '@octokit/types': 9.2.3
+      '@octokit/types': 9.3.1
       universal-user-agent: 6.0.0
     transitivePeerDependencies:
       - encoding
     dev: false
 
-  /@octokit/openapi-types@17.2.0:
-    resolution: {integrity: sha512-MazrFNx4plbLsGl+LFesMo96eIXkFgEtaKbnNpdh4aQ0VM10aoylFsTYP1AEjkeoRNZiiPe3T6Gl2Hr8dJWdlQ==}
+  /@octokit/openapi-types@18.0.0:
+    resolution: {integrity: sha512-V8GImKs3TeQRxRtXFpG2wl19V7444NIOTDF24AWuIbmNaNYOQMWRbjcGDXV5B+0n887fgDcuMNOmlul+k+oJtw==}
+    dev: false
 
   /@octokit/plugin-paginate-rest@6.1.2(@octokit/core@4.2.1):
     resolution: {integrity: sha512-qhrmtQeHU/IivxucOV1bbI/xZyC/iOBhclokv7Sut5vnejAIAEXVcGQeRpQlU39E0WwK9lNvJHphHri/DB6lbQ==}
@@ -380,7 +375,7 @@ packages:
     dependencies:
       '@octokit/core': 4.2.1
       '@octokit/tsconfig': 1.0.2
-      '@octokit/types': 9.2.3
+      '@octokit/types': 9.3.1
     dev: false
 
   /@octokit/plugin-request-log@1.0.4(@octokit/core@4.2.1):
@@ -391,21 +386,21 @@ packages:
       '@octokit/core': 4.2.1
     dev: false
 
-  /@octokit/plugin-rest-endpoint-methods@7.1.3(@octokit/core@4.2.1):
-    resolution: {integrity: sha512-0aoPd4f1k/KXPTGSX0NbxcBrShBHArgcW3pujEvLa6wUfcfA1BehxQ2Ifwa6CbJ4SfzaO79FvGgaUipoxDsgjA==}
+  /@octokit/plugin-rest-endpoint-methods@7.2.1(@octokit/core@4.2.1):
+    resolution: {integrity: sha512-UmlNrrcF+AXxcxhZslTt1a/8aDxUKH0trrt/mJCxEPrWbW1ZEc+6xxcd5/n0iw3b+Xo8UBJQUKDr71+vNCBpRQ==}
     engines: {node: '>= 14'}
     peerDependencies:
       '@octokit/core': '>=3'
     dependencies:
       '@octokit/core': 4.2.1
-      '@octokit/types': 9.2.3
+      '@octokit/types': 9.3.1
     dev: false
 
   /@octokit/request-error@3.0.3:
     resolution: {integrity: sha512-crqw3V5Iy2uOU5Np+8M/YexTlT8zxCfI+qu+LxUB7SZpje4Qmx3mub5DfEKSO8Ylyk0aogi6TYdf6kxzh2BguQ==}
     engines: {node: '>= 14'}
     dependencies:
-      '@octokit/types': 9.2.3
+      '@octokit/types': 9.3.1
       deprecation: 2.3.1
       once: 1.4.0
     dev: false
@@ -416,7 +411,7 @@ packages:
     dependencies:
       '@octokit/endpoint': 7.0.6
       '@octokit/request-error': 3.0.3
-      '@octokit/types': 9.2.3
+      '@octokit/types': 9.3.1
       is-plain-object: 5.0.0
       node-fetch: 2.6.11
       universal-user-agent: 6.0.0
@@ -431,7 +426,7 @@ packages:
       '@octokit/core': 4.2.1
       '@octokit/plugin-paginate-rest': 6.1.2(@octokit/core@4.2.1)
       '@octokit/plugin-request-log': 1.0.4(@octokit/core@4.2.1)
-      '@octokit/plugin-rest-endpoint-methods': 7.1.3(@octokit/core@4.2.1)
+      '@octokit/plugin-rest-endpoint-methods': 7.2.1(@octokit/core@4.2.1)
     transitivePeerDependencies:
       - encoding
     dev: false
@@ -440,10 +435,11 @@ packages:
     resolution: {integrity: sha512-I0vDR0rdtP8p2lGMzvsJzbhdOWy405HcGovrspJ8RRibHnyRgggUSNO5AIox5LmqiwmatHKYsvj6VGFHkqS7lA==}
     dev: false
 
-  /@octokit/types@9.2.3:
-    resolution: {integrity: sha512-MMeLdHyFIALioycq+LFcA71v0S2xpQUX2cw6pPbHQjaibcHYwLnmK/kMZaWuGfGfjBJZ3wRUq+dOaWsvrPJVvA==}
+  /@octokit/types@9.3.1:
+    resolution: {integrity: sha512-zfJzyXLHC42sWcn2kS+oZ/DRvFZBYCCbfInZtwp1Uopl1qh6pRg4NSP/wFX1xCOpXvEkctiG1sxlSlkZmzvxdw==}
     dependencies:
-      '@octokit/openapi-types': 17.2.0
+      '@octokit/openapi-types': 18.0.0
+    dev: false
 
   /@prisma/client@4.15.0(prisma@4.15.0):
     resolution: {integrity: sha512-xnROvyABcGiwqRNdrObHVZkD9EjkJYHOmVdlKy1yGgI+XOzvMzJ4tRg3dz1pUlsyhKxXGCnjIQjWW+2ur+YXuw==}
@@ -525,8 +521,8 @@ packages:
     resolution: {integrity: sha512-Hr5Jfhc9eYOQNPYO5WLDq/n4jqijdHNlDXjuAQkkt+mWdQR+XJToOHrsD4cPaMXpn6KO7y2+wM8AZEs8VpBLVA==}
     dev: true
 
-  /@types/node@20.2.6:
-    resolution: {integrity: sha512-GQBWUtGoefMEOx/vu+emHEHU5aw6JdDoEtZhoBrHFPZbA/YNRFfN996XbBASEWdvmLSLyv9FKYppYGyZjCaq/g==}
+  /@types/node@20.3.0:
+    resolution: {integrity: sha512-cumHmIAf6On83X7yP+LrsEyUOf/YlociZelmpRYaGFydoaPdxdt80MAbu6vWerQT2COCp2nPvHdsbD7tHn/YlQ==}
 
   /@types/semver@7.5.0:
     resolution: {integrity: sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==}
@@ -535,7 +531,7 @@ packages:
   /@types/ws@8.5.5:
     resolution: {integrity: sha512-lwhs8hktwxSjf9UaZ9tG5M03PGogvFaH8gUgLNbN9HKIg0dvv6q+gkSuJ8HN4/VbyxkuLzCjlN7GquQ0gUJfIg==}
     dependencies:
-      '@types/node': 20.2.6
+      '@types/node': 20.3.0
     dev: false
 
   /@typescript-eslint/eslint-plugin@5.59.9(@typescript-eslint/parser@5.59.9)(eslint@8.42.0)(typescript@5.1.3):
@@ -855,8 +851,8 @@ packages:
     resolution: {integrity: sha512-bBhDWU3TF9KADxR/mHp1K4Bvu/LRtFQdGyBjADu4e66F3ZnD4kp12W/SJCttIaCcMXzPV3sfty6eDGRNRph51Q==}
     dev: false
 
-  /discord.js@14.11.1-dev.1686398626-6c2242f.0(bufferutil@4.0.7)(utf-8-validate@6.0.3):
-    resolution: {integrity: sha512-KCLYvTCKR3T9WuXjcaIaLhSObLiiepJ8Z6fwSK1AZLpFzVKjJSO0HrSz3XRw/iFRf8iUz6Ryzpy4ZC4b/eTg2A==}
+  /discord.js@14.11.1-dev.1686485047-6c2242f.0(bufferutil@4.0.7)(utf-8-validate@6.0.3):
+    resolution: {integrity: sha512-VcyQI98tTMtsrXaLPW9v9sn722kADR2vo35rMIJsfQmes6CLwX7XH3lj4BIO/XPU9k4i8xjJ4jt068vooXB0CA==}
     engines: {node: '>=16.9.0'}
     dependencies:
       '@discordjs/builders': 1.6.3

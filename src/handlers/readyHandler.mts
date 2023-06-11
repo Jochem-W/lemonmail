@@ -1,4 +1,5 @@
 import { Discord } from "../clients.mjs"
+import { reportError } from "../errors.mjs"
 import { DefaultConfig } from "../models/config.mjs"
 import type { Handler } from "../types/handler.mjs"
 import { fetchChannel, uniqueName } from "../utilities/discordUtilities.mjs"
@@ -65,6 +66,10 @@ export class ReadyHandler implements Handler<"ready"> {
     process.on("SIGTERM", () => process.exit())
     process.on("exit", () => {
       Discord.destroy()
+        .then(() => setStateSync("DOWN"))
+        .catch((e) =>
+          e instanceof Error ? void reportError(e) : console.error(e)
+        )
       setStateSync("DOWN")
     })
   }

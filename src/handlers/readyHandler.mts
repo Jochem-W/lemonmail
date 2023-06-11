@@ -70,7 +70,6 @@ export class ReadyHandler implements Handler<"ready"> {
         .catch((e) =>
           e instanceof Error ? void reportError(e) : console.error(e)
         )
-      setStateSync("DOWN")
     })
   }
 }

@@ -29,6 +29,30 @@
     "utf-8-validate": "^6.0.3",
     "zlib-sync": "^0.1.8"
   },
+  "eslintConfig": {
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:@typescript-eslint/recommended-requiring-type-checking",
+      "plugin:@typescript-eslint/strict",
+      "prettier"
+    ],
+    "rules": {
+      "@typescript-eslint/non-nullable-type-assertion-style": "off",
+      "@typescript-eslint/consistent-type-definitions": [
+        "warn",
+        "type"
+      ]
+    },
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "root": true,
+    "parserOptions": {
+      "project": "./tsconfig.json"
+    }
+  },
   "prettier": {
     "semi": false,
     "plugins": [

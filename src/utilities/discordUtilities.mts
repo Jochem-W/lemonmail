@@ -53,7 +53,7 @@ function userDisplayName(user: User) {
     return user.globalName
   }
 
-  return uniqueName(user)
+  return user.username
 }
 
 export async function tryFetchMember(

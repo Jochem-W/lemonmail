@@ -192,8 +192,10 @@ export async function processGuildMessage(
     data: { lastMessage: message.id },
   })
 
+  const author = (await tryFetchMember(message.author)) ?? message.author
+
   await message.channel.messages.edit(thread.id, {
-    content: `📤 ${bold(message.author.tag)}: ${
+    content: `📤 ${bold(displayName(author))}: ${
       message.content.replace(prefix, "") || "[no text content]"
     }`,
   })

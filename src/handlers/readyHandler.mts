@@ -13,7 +13,6 @@ import {
   userMention,
 } from "discord.js"
 import type { MessageCreateOptions } from "discord.js"
-import { writeFileSync } from "fs"
 import { mkdir, readFile, writeFile } from "fs/promises"
 
 type State = "UP" | "DOWN" | "RECREATE"
@@ -62,15 +61,8 @@ export class ReadyHandler implements Handler<"ready"> {
     await setState("UP")
     await setVersion()
 
-    process.on("SIGINT", () => process.exit())
-    process.on("SIGTERM", () => process.exit())
-    process.on("exit", () => {
-      Discord.destroy()
-        .then(() => setStateSync("DOWN"))
-        .catch((e) =>
-          e instanceof Error ? void reportError(e) : console.error(e)
-        )
-    })
+    process.on("SIGINT", () => exitListener())
+    process.on("SIGTERM", () => exitListener())
   }
 }
 
@@ -150,6 +142,14 @@ async function getChangelog() {
   return codeBlock(description)
 }
 
+function exitListener() {
+  Discord.destroy()
+    .then(() => setState("DOWN"))
+    .catch((e) => {
+      e instanceof Error ? void reportError(e) : console.error(e)
+    })
+}
+
 type ArbitraryObject = Record<string, unknown>
 
 function isErrnoException(error: unknown): error is NodeJS.ErrnoException {
@@ -193,10 +193,6 @@ async function setVersion() {
 
 async function setState(status: State) {
   await writeFile("status", status, { encoding: "utf8" })
-}
-
-function setStateSync(status: State) {
-  writeFileSync("status", status, { encoding: "utf8" })
 }
 
 async function getState() {

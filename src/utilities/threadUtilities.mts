@@ -1,4 +1,4 @@
-import { Discord, Prisma } from "../clients.mjs"
+import { Prisma } from "../clients.mjs"
 import { dmsDisabledMessage } from "../messages/dmsDisabledMessage.mjs"
 import { memberLeftMessage } from "../messages/memberLeftMessage.mjs"
 import { receivedMessage } from "../messages/receivedMessage.mjs"
@@ -25,12 +25,6 @@ import {
 import { Stream } from "stream"
 import { MIMEType } from "util"
 
-const guild = await Discord.guilds.fetch(DefaultConfig.guild.id)
-const mailForum = await fetchChannel(
-  DefaultConfig.guild.mailForum,
-  ChannelType.GuildForum
-)
-
 export function attachmentsToEmbeds(message: Message, colour?: number) {
   const embeds = []
   for (const attachment of message.attachments.values()) {
@@ -52,7 +46,13 @@ export function attachmentsToEmbeds(message: Message, colour?: number) {
 }
 
 export async function createThreadFromMessage(message: Message) {
-  const member = await guild.members.fetch(message.author.id)
+  const mailForum = await fetchChannel(
+    message.client,
+    DefaultConfig.guild.mailForum,
+    ChannelType.GuildForum
+  )
+
+  const member = await mailForum.guild.members.fetch(message.author.id)
 
   const channel = await mailForum.threads.create({
     name: `${displayName(member)} ${member.id}`,
@@ -101,6 +101,12 @@ export async function createThreadFromInteraction(
   member: GuildMember,
   interaction: CommandInteraction
 ) {
+  const mailForum = await fetchChannel(
+    member.client,
+    DefaultConfig.guild.mailForum,
+    ChannelType.GuildForum
+  )
+
   const channel = await mailForum.threads.create({
     name: `${displayName(member)} ${member.id}`,
     message: await staffInfoMessage(member),
@@ -160,7 +166,9 @@ export async function processGuildMessage(
   message: Message,
   prefix: string
 ) {
-  const member = await tryFetchMember(thread.userId)
+  const guild = await message.client.guilds.fetch(DefaultConfig.guild.id)
+
+  const member = await tryFetchMember(guild, thread.userId)
   if (!member) {
     await message.channel.send(memberLeftMessage(thread, message))
     return
@@ -192,7 +200,7 @@ export async function processGuildMessage(
     data: { lastMessage: message.id },
   })
 
-  const author = (await tryFetchMember(message.author)) ?? message.author
+  const author = (await tryFetchMember(guild, message.author)) ?? message.author
 
   await message.channel.messages.edit(thread.id, {
     content: `📤 ${bold(displayName(author))}: ${
@@ -216,11 +224,15 @@ export async function processDmMessage(message: Message) {
     thread = await createThreadFromMessage(message)
   }
 
-  const channel = await fetchChannel(thread.id, ChannelType.PublicThread)
+  const channel = await fetchChannel(
+    message.client,
+    thread.id,
+    ChannelType.PublicThread
+  )
 
   await channel.send(await receivedMessage(message))
 
-  const member = await tryFetchMember(message.author.id)
+  const member = await tryFetchMember(channel.guild, message.author.id)
   try {
     await message.author.send(await sentMessage(message))
   } catch (e) {

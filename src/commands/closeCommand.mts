@@ -1,4 +1,4 @@
-import { Discord, Prisma } from "../clients.mjs"
+import { Prisma } from "../clients.mjs"
 import { invalidThreadMessage } from "../messages/invalidThreadMessage.mjs"
 import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
 import { DefaultConfig } from "../models/config.mjs"
@@ -8,6 +8,7 @@ import {
   fetchChannel,
   tryFetchMember,
 } from "../utilities/discordUtilities.mjs"
+import { interactionGuild } from "../utilities/interactionUtilities.mjs"
 import {
   bold,
   ChannelType,
@@ -34,6 +35,8 @@ export const CloseCommand = slashCommand({
     ),
   ],
   async handle(interaction, reason) {
+    const guild = await interactionGuild(interaction, true)
+
     const thread = await Prisma.thread.findFirst({
       where: { id: interaction.channelId, active: true },
     })
@@ -42,7 +45,11 @@ export const CloseCommand = slashCommand({
       return
     }
 
-    const channel = await fetchChannel(thread.id, ChannelType.PublicThread)
+    const channel = await fetchChannel(
+      interaction.client,
+      thread.id,
+      ChannelType.PublicThread
+    )
     const newName = `${channel.name} (${reason ?? "closed"})`
     if (newName.length > 100) {
       await interaction.reply({
@@ -75,7 +82,7 @@ export const CloseCommand = slashCommand({
     )
 
     try {
-      await Discord.users.send(
+      await interaction.client.users.send(
         thread.userId,
         await threadStatusMessage(interaction, "closed")
       )
@@ -91,7 +98,7 @@ export const CloseCommand = slashCommand({
     await channel.messages.edit(channel.id, {
       content: `${bold(
         displayName(
-          (await tryFetchMember(interaction.user)) ?? interaction.user
+          (await tryFetchMember(guild, interaction.user)) ?? interaction.user
         )
       )}: [thread closed]`,
     })

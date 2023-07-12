@@ -1,4 +1,3 @@
-import { Discord } from "../clients.mjs"
 import { logError } from "../errors.mjs"
 import { DefaultConfig } from "../models/config.mjs"
 import { handler } from "../models/handler.mjs"
@@ -6,7 +5,7 @@ import { fetchChannel, uniqueName } from "../utilities/discordUtilities.mjs"
 import { Variables } from "../variables.mjs"
 import { Octokit } from "@octokit/rest"
 import { ChannelType, codeBlock, EmbedBuilder, userMention } from "discord.js"
-import type { MessageCreateOptions } from "discord.js"
+import type { Client, MessageCreateOptions } from "discord.js"
 import { mkdir, readFile, writeFile } from "fs/promises"
 
 type State = "UP" | "DOWN" | "RECREATE"
@@ -33,6 +32,7 @@ export const ReadyHandler = handler({
     }
 
     const channel = await fetchChannel(
+      client,
       DefaultConfig.guild.restart.channel,
       ChannelType.GuildText
     )
@@ -54,8 +54,8 @@ export const ReadyHandler = handler({
     await setState("UP")
     await setVersion()
 
-    process.on("SIGINT", () => exitListener())
-    process.on("SIGTERM", () => exitListener())
+    process.on("SIGINT", () => exitListener(client))
+    process.on("SIGTERM", () => exitListener(client))
   },
 })
 
@@ -135,11 +135,12 @@ async function getChangelog() {
   return codeBlock(description)
 }
 
-function exitListener() {
-  Discord.destroy()
+function exitListener(client: Client<true>) {
+  client
+    .destroy()
     .then(() => setState("DOWN"))
     .catch((e) => {
-      e instanceof Error ? void logError(e) : console.error(e)
+      e instanceof Error ? void logError(client, e) : console.error(e)
     })
 }
 

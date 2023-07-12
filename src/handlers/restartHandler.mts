@@ -20,6 +20,7 @@ export const RestartHandler = handler({
       const dmChannel = user.dmChannel ?? (await user.createDM())
 
       const threadChannel = await fetchChannel(
+        client,
         thread.id,
         ChannelType.PublicThread
       )

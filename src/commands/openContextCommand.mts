@@ -5,6 +5,7 @@ import { userIsBotMessage } from "../messages/userIsBotMessage.mjs"
 import { userNotInGuildMessage } from "../messages/userNotInGuildMessage.mjs"
 import { contextMenuCommand } from "../models/contextMenuCommand.mjs"
 import { tryFetchMember } from "../utilities/discordUtilities.mjs"
+import { interactionGuild } from "../utilities/interactionUtilities.mjs"
 import { createThreadFromInteraction } from "../utilities/threadUtilities.mjs"
 import { ApplicationCommandType, PermissionFlagsBits } from "discord.js"
 
@@ -14,6 +15,8 @@ export const OpenContextCommand = contextMenuCommand({
   defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
   dmPermission: false,
   async handle(interaction, user) {
+    const guild = await interactionGuild(interaction, true)
+
     if (user.bot) {
       await interaction.reply({ ...userIsBotMessage(user), ephemeral: true })
       return
@@ -29,7 +32,7 @@ export const OpenContextCommand = contextMenuCommand({
       return
     }
 
-    const member = await tryFetchMember(user.id)
+    const member = await tryFetchMember(guild, user.id)
     if (!member) {
       await interaction.editReply(userNotInGuildMessage(user))
       return

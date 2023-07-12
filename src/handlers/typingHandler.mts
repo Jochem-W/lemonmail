@@ -15,6 +15,7 @@ export const TypingHandler = handler({
     }
 
     const threadChannel = await fetchChannel(
+      typing.client,
       thread.id,
       ChannelType.PublicThread
     )

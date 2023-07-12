@@ -1,4 +1,4 @@
-import { Discord, Prisma } from "../clients.mjs"
+import { Prisma } from "../clients.mjs"
 import { component } from "../models/component.mjs"
 import { DefaultConfig } from "../models/config.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
@@ -18,8 +18,6 @@ import type {
   MessageActionRowComponentBuilder,
   EmbedFooterOptions,
 } from "discord.js"
-
-const guild = await Discord.guilds.fetch(DefaultConfig.guild.id)
 
 const createThreadButton = component({
   type: ComponentType.Button,
@@ -60,13 +58,19 @@ const createThreadButton = component({
 
     await interaction.update({ components: rows })
 
-    const channel = await fetchChannel(channelId, ChannelType.DM)
+    const channel = await fetchChannel(
+      interaction.client,
+      channelId,
+      ChannelType.DM
+    )
     const message = await channel.messages.fetch(messageId) // TODO
     await processDmMessage(message)
   },
 })
 
-export function confirmationMessage(message: Message) {
+export async function confirmationMessage(message: Message) {
+  const guild = await message.client.guilds.fetch(DefaultConfig.guild.id)
+
   const footer: EmbedFooterOptions = { text: guild.name }
   const iconURL = guild.iconURL()
   if (iconURL) {

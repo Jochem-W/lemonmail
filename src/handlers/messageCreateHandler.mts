@@ -23,7 +23,7 @@ export const MessageCreateHandler = handler({
       })
 
       if (!thread) {
-        await message.reply(confirmationMessage(message))
+        await message.reply(await confirmationMessage(message))
         return
       }
 

@@ -1,16 +1,15 @@
-import { Discord } from "../clients.mjs"
 import { DefaultConfig } from "../models/config.mjs"
 import { displayName } from "../utilities/discordUtilities.mjs"
 import { CommandInteraction, EmbedBuilder, Message } from "discord.js"
 import type { EmbedFooterOptions } from "discord.js"
-
-const guild = await Discord.guilds.fetch(DefaultConfig.guild.id)
 
 export async function threadStatusMessage(
   data: CommandInteraction | Message,
   type: "closed" | "opened",
   reason?: string
 ) {
+  const guild = await data.client.guilds.fetch(DefaultConfig.guild.id)
+
   const footer: EmbedFooterOptions = { text: guild.name }
   const iconURL = guild.iconURL()
   if (iconURL) {

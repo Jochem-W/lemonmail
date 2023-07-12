@@ -1,11 +1,4 @@
-import { Discord } from "../clients.mjs"
-import {
-  ChannelNotFoundError,
-  GuildOnlyError,
-  InvalidChannelTypeError,
-  OwnerOnlyError,
-} from "../errors.mjs"
-import { DefaultConfig } from "../models/config.mjs"
+import { ChannelNotFoundError, InvalidChannelTypeError } from "../errors.mjs"
 import {
   User,
   type Channel,
@@ -13,20 +6,10 @@ import {
   GuildMember,
   type PublicThreadChannel,
   type Snowflake,
+  Guild,
 } from "discord.js"
-import {
-  ChannelType,
-  DiscordAPIError,
-  RESTJSONErrorCodes,
-  Team,
-} from "discord.js"
-import type {
-  FetchMemberOptions,
-  Interaction,
-  UserResolvable,
-} from "discord.js"
-
-const guild = await Discord.guilds.fetch(DefaultConfig.guild.id)
+import { ChannelType, DiscordAPIError, RESTJSONErrorCodes } from "discord.js"
+import type { Client, FetchMemberOptions, UserResolvable } from "discord.js"
 
 export function uniqueName(user: User) {
   if (user.discriminator !== "0") {
@@ -57,8 +40,17 @@ function userDisplayName(user: User) {
 }
 
 export async function tryFetchMember(
+  data: { id: Snowflake; client: Client<true> } | Guild,
   options: FetchMemberOptions | UserResolvable
 ) {
+  let guild
+  if (!(data instanceof Guild)) {
+    const { id, client } = data
+    guild = await client.guilds.fetch(id)
+  } else {
+    guild = data
+  }
+
   try {
     return await guild.members.fetch(options)
   } catch (e) {
@@ -74,53 +66,30 @@ export async function tryFetchMember(
 }
 
 export async function fetchChannel<T extends ChannelType>(
+  client: Client<true>,
   id: Snowflake,
-  type: T,
+  type: T | T[],
   options?: FetchChannelOptions
 ) {
-  const channel = await Discord.channels.fetch(id, options)
+  const channel = await client.channels.fetch(id, {
+    allowUnknownGuild: true,
+    ...options,
+  })
   if (!channel) {
     throw new ChannelNotFoundError(id)
   }
 
-  if (channel.type !== type) {
-    throw new InvalidChannelTypeError(channel, type)
-  }
+  if (
+    (typeof type === "number" && channel.type !== type) ||
+    (typeof type === "object" && !type.includes(channel.type as T))
+  )
+    if (channel.type !== type) {
+      throw new InvalidChannelTypeError(channel, type)
+    }
 
   return channel as T extends
     | ChannelType.PublicThread
     | ChannelType.AnnouncementThread
     ? PublicThreadChannel
     : Extract<Channel, { type: T }>
-}
-
-export async function fetchInteractionGuild(interaction: Interaction) {
-  if (!interaction.inGuild()) {
-    throw new GuildOnlyError()
-  }
-
-  return interaction.guild ?? (await Discord.guilds.fetch(interaction.guildId))
-}
-
-export async function ensureOwner(interaction: Interaction) {
-  let application = interaction.client.application
-  if (!application.owner) {
-    application = await application.fetch()
-  }
-
-  if (!application.owner) {
-    throw new OwnerOnlyError()
-  }
-
-  if (application.owner instanceof Team) {
-    if (!application.owner.members.has(interaction.user.id)) {
-      throw new OwnerOnlyError()
-    }
-
-    return
-  }
-
-  if (application.owner.id !== interaction.user.id) {
-    throw new OwnerOnlyError()
-  }
 }

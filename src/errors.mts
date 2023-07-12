@@ -8,6 +8,7 @@ import type {
   AutocompleteFocusedOption,
   AutocompleteInteraction,
   Channel,
+  Client,
   ComponentType,
   Snowflake,
 } from "discord.js"
@@ -229,9 +230,10 @@ export class UnregisteredNameError extends CustomError {
   }
 }
 
-export async function logError(error: Error) {
+export async function logError(client: Client<true>, error: Error) {
   console.error(error)
   const channel = await fetchChannel(
+    client,
     DefaultConfig.guild.errorChannel,
     ChannelType.GuildText
   )

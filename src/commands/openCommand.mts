@@ -5,6 +5,7 @@ import { userIsBotMessage } from "../messages/userIsBotMessage.mjs"
 import { userNotInGuildMessage } from "../messages/userNotInGuildMessage.mjs"
 import { slashCommand, slashOption } from "../models/slashCommand.mjs"
 import { tryFetchMember } from "../utilities/discordUtilities.mjs"
+import { interactionGuild } from "../utilities/interactionUtilities.mjs"
 import { createThreadFromInteraction } from "../utilities/threadUtilities.mjs"
 import { PermissionFlagsBits, SlashCommandUserOption } from "discord.js"
 
@@ -22,6 +23,8 @@ export const OpenCommand = slashCommand({
     ),
   ],
   async handle(interaction, user) {
+    const guild = await interactionGuild(interaction, true)
+
     if (user.bot) {
       await interaction.reply({ ...userIsBotMessage(user), ephemeral: true })
       return
@@ -37,7 +40,7 @@ export const OpenCommand = slashCommand({
       return
     }
 
-    const member = await tryFetchMember(user.id)
+    const member = await tryFetchMember(guild, user.id)
     if (!member) {
       await interaction.editReply(userNotInGuildMessage(user))
       return

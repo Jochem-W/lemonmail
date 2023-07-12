@@ -1,4 +1,4 @@
-import { DefaultConfig } from "../models/config.mjs"
+import { Config } from "../models/config.mjs"
 import { displayName } from "../utilities/discordUtilities.mjs"
 import { CommandInteraction, EmbedBuilder, Message } from "discord.js"
 import type { EmbedFooterOptions } from "discord.js"
@@ -8,7 +8,7 @@ export async function threadStatusMessage(
   type: "closed" | "opened",
   reason?: string
 ) {
-  const guild = await data.client.guilds.fetch(DefaultConfig.guild.id)
+  const guild = await data.client.guilds.fetch(Config.guild)
 
   const footer: EmbedFooterOptions = { text: guild.name }
   const iconURL = guild.iconURL()

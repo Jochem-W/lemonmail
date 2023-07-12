@@ -6,7 +6,7 @@ import {
 } from "./commands.mjs"
 import { CommandNotFoundByNameError, logError } from "./errors.mjs"
 import { Handlers } from "./handlers.mjs"
-import { DefaultConfig } from "./models/config.mjs"
+import { Config } from "./models/config.mjs"
 import type { Command } from "./types/command.mjs"
 import { Variables } from "./variables.mjs"
 import {
@@ -40,7 +40,7 @@ const discord = new Client({
     Partials.ThreadMember,
   ],
 })
-discord.rest.setToken(Variables.discordToken)
+discord.rest.setToken(Variables.discordBotToken)
 
 const commandsBody: RESTPutAPIApplicationGuildCommandsJSONBody = []
 for (const command of [
@@ -53,12 +53,9 @@ for (const command of [
 }
 
 const route =
-  Variables.nodeEnvironment === "production"
-    ? Routes.applicationCommands(DefaultConfig.bot.applicationId)
-    : Routes.applicationGuildCommands(
-        DefaultConfig.bot.applicationId,
-        DefaultConfig.guild.id
-      )
+  Variables.nodeEnv === "production"
+    ? Routes.applicationCommands(Config.applicationId)
+    : Routes.applicationGuildCommands(Config.applicationId, Config.guild)
 
 const applicationCommands = (await discord.rest.put(route, {
   body: commandsBody,
@@ -120,4 +117,4 @@ for (const handler of Handlers) {
   })
 }
 
-await discord.login(Variables.discordToken)
+await discord.login(Variables.discordBotToken)

@@ -1,10 +1,10 @@
 import { logError } from "../errors.mjs"
-import { DefaultConfig } from "../models/config.mjs"
+import { Config } from "../models/config.mjs"
 import { handler } from "../models/handler.mjs"
 import { fetchChannel, uniqueName } from "../utilities/discordUtilities.mjs"
 import { Variables } from "../variables.mjs"
 import { Octokit } from "@octokit/rest"
-import { ChannelType, codeBlock, EmbedBuilder, userMention } from "discord.js"
+import { ChannelType, codeBlock, EmbedBuilder } from "discord.js"
 import type { Client, MessageCreateOptions } from "discord.js"
 import { mkdir, readFile, writeFile } from "fs/promises"
 
@@ -33,7 +33,7 @@ export const ReadyHandler = handler({
 
     const channel = await fetchChannel(
       client,
-      DefaultConfig.guild.restart.channel,
+      Config.channels.restart,
       ChannelType.GuildText
     )
 
@@ -43,10 +43,6 @@ export const ReadyHandler = handler({
           .setTitle(title)
           .setDescription((await getChangelog()) ?? null),
       ],
-    }
-
-    if (DefaultConfig.guild.restart.user) {
-      options.content = userMention(DefaultConfig.guild.restart.user)
     }
 
     await channel.send(options)
@@ -60,7 +56,7 @@ export const ReadyHandler = handler({
 })
 
 async function getChangelog() {
-  if (!Variables.commitHash) {
+  if (!Variables.commitHash || !Config.repository || !Variables.githubToken) {
     return null
   }
 
@@ -86,8 +82,8 @@ async function getChangelog() {
   const response = await octokit.rest.repos.compareCommits({
     base: previousVersion.trim(),
     head: Variables.commitHash,
-    owner: DefaultConfig.repository.owner,
-    repo: DefaultConfig.repository.name,
+    owner: Config.repository.owner,
+    repo: Config.repository.name,
   })
 
   let description = `${previousVersion.slice(

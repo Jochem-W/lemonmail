@@ -1,7 +1,7 @@
 import { Prisma } from "../clients.mjs"
 import { invalidThreadMessage } from "../messages/invalidThreadMessage.mjs"
 import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
-import { DefaultConfig } from "../models/config.mjs"
+import { Config } from "../models/config.mjs"
 import { slashCommand, slashOption } from "../models/slashCommand.mjs"
 import {
   displayName,
@@ -107,7 +107,7 @@ export const CloseCommand = slashCommand({
       "Thread was closed manually"
     )
     await channel.setAppliedTags(
-      [DefaultConfig.guild.tags.closed],
+      [Config.tags.closed],
       "Thread was closed manually"
     )
     await channel.setLocked(true, "Thread was closed manually")

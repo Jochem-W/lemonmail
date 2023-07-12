@@ -1,6 +1,6 @@
 import { Prisma } from "../clients.mjs"
 import { component } from "../models/component.mjs"
-import { DefaultConfig } from "../models/config.mjs"
+import { Config } from "../models/config.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
 import { processDmMessage } from "../utilities/threadUtilities.mjs"
 import { blockedMessage } from "./blockedMessage.mjs"
@@ -69,7 +69,7 @@ const createThreadButton = component({
 })
 
 export async function confirmationMessage(message: Message) {
-  const guild = await message.client.guilds.fetch(DefaultConfig.guild.id)
+  const guild = await message.client.guilds.fetch(Config.guild)
 
   const footer: EmbedFooterOptions = { text: guild.name }
   const iconURL = guild.iconURL()

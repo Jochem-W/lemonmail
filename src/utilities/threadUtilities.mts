@@ -5,7 +5,7 @@ import { receivedMessage } from "../messages/receivedMessage.mjs"
 import { sentMessage } from "../messages/sentMessage.mjs"
 import { staffInfoMessage } from "../messages/staffInfoMessage.mjs"
 import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
-import { DefaultConfig } from "../models/config.mjs"
+import { Config } from "../models/config.mjs"
 import {
   displayName,
   fetchChannel,
@@ -48,7 +48,7 @@ export function attachmentsToEmbeds(message: Message, colour?: number) {
 export async function createThreadFromMessage(message: Message) {
   const mailForum = await fetchChannel(
     message.client,
-    DefaultConfig.guild.mailForum,
+    Config.channels.mail,
     ChannelType.GuildForum
   )
 
@@ -58,10 +58,7 @@ export async function createThreadFromMessage(message: Message) {
     name: `${displayName(member)} ${member.id}`,
     message: await staffInfoMessage(member),
     reason: "Member sent a direct message to the bot",
-    appliedTags: [
-      DefaultConfig.guild.tags.open,
-      DefaultConfig.guild.tags.awaitingStaff,
-    ],
+    appliedTags: [Config.tags.open, Config.tags.awaitingStaff],
   })
 
   await channel.messages.pin(channel.id, "Make the message more easy to find")
@@ -103,7 +100,7 @@ export async function createThreadFromInteraction(
 ) {
   const mailForum = await fetchChannel(
     member.client,
-    DefaultConfig.guild.mailForum,
+    Config.channels.mail,
     ChannelType.GuildForum
   )
 
@@ -111,10 +108,7 @@ export async function createThreadFromInteraction(
     name: `${displayName(member)} ${member.id}`,
     message: await staffInfoMessage(member),
     reason: "Staff member manually opened a thread",
-    appliedTags: [
-      DefaultConfig.guild.tags.open,
-      DefaultConfig.guild.tags.awaitingStaff,
-    ],
+    appliedTags: [Config.tags.open, Config.tags.awaitingStaff],
   })
 
   await channel.messages.pin(channel.id, "Make the message more easy to find")
@@ -166,7 +160,7 @@ export async function processGuildMessage(
   message: Message,
   prefix: string
 ) {
-  const guild = await message.client.guilds.fetch(DefaultConfig.guild.id)
+  const guild = await message.client.guilds.fetch(Config.guild)
 
   const member = await tryFetchMember(guild, thread.userId)
   if (!member) {
@@ -209,8 +203,8 @@ export async function processGuildMessage(
   })
   if (message.channel.isThread()) {
     await message.channel.setAppliedTags([
-      DefaultConfig.guild.tags.open,
-      DefaultConfig.guild.tags.awaitingUser,
+      Config.tags.open,
+      Config.tags.awaitingUser,
     ])
   }
 }
@@ -253,10 +247,7 @@ export async function processDmMessage(message: Message) {
       message.content || "[no text content]"
     }`,
   })
-  await channel.setAppliedTags([
-    DefaultConfig.guild.tags.open,
-    DefaultConfig.guild.tags.awaitingStaff,
-  ])
+  await channel.setAppliedTags([Config.tags.open, Config.tags.awaitingStaff])
 }
 
 export async function renameAttachments(message: Message) {
@@ -279,7 +270,7 @@ export function messageIsFromUser(message: Message) {
 }
 
 export function messageHasSendPrefix(message: Message) {
-  for (const prefix of DefaultConfig.sendPrefixes) {
+  for (const prefix of Config.sendPrefixes) {
     if (
       message.content.startsWith(`${prefix} `) ||
       (message.content === prefix && message.attachments.size !== 0)

@@ -1,6 +1,13 @@
-export const Variables = {
-  discordToken: process.env["DISCORD_BOT_TOKEN"] as string,
-  commitHash: process.env["COMMIT_HASH"],
-  githubToken: process.env["GITHUB_TOKEN"] as string,
-  nodeEnvironment: process.env["NODE_ENV"] as string,
-}
+import camelcaseKeys from "camelcase-keys"
+import { z } from "zod"
+
+const model = z
+  .object({
+    DISCORD_BOT_TOKEN: z.string(),
+    COMMIT_HASH: z.string().optional(),
+    GITHUB_TOKEN: z.string().optional(),
+    NODE_ENV: z.string().optional().default("development"),
+  })
+  .transform((arg) => camelcaseKeys(arg))
+
+export const Variables = await model.parseAsync(process.env)

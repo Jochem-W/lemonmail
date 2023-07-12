@@ -1,110 +1,24 @@
-import type { Snowflake } from "discord.js"
 import { readFile } from "fs/promises"
+import { z } from "zod"
 
-type RawConfig = {
-  bot: {
-    applicationId: string
-  }
-  guild: {
-    errorChannel: string
-    id: string
-    mailForum: string
-    restart: {
-      channel: string
-      user?: string
-    }
-    tags: {
-      awaitingStaff: string
-      awaitingUser: string
-      closed: string
-      open: string
-    }
-  }
-  repository: {
-    name: string
-    owner: string
-  }
-  sendPrefixes: string[]
-}
+const model = z.object({
+  applicationId: z.string(),
+  guild: z.string(),
+  channels: z.object({
+    error: z.string(),
+    mail: z.string(),
+    restart: z.string(),
+  }),
+  tags: z.object({
+    awaitingStaff: z.string(),
+    awaitingUser: z.string(),
+    closed: z.string(),
+    open: z.string(),
+  }),
+  repository: z.object({ name: z.string(), owner: z.string() }).optional(),
+  sendPrefixes: z.array(z.string()),
+})
 
-class BotConfig {
-  public readonly applicationId: Snowflake
-
-  public constructor(data: RawConfig["bot"]) {
-    this.applicationId = data.applicationId
-  }
-}
-
-class GuildConfig {
-  public readonly errorChannel: Snowflake
-  public readonly id: Snowflake
-  public readonly mailForum: Snowflake
-  public readonly restart: GuildRestartConfig
-  public readonly tags: GuildTagsConfig
-
-  public constructor(data: RawConfig["guild"]) {
-    this.errorChannel = data.errorChannel
-    this.id = data.id
-    this.mailForum = data.mailForum
-    this.restart = new GuildRestartConfig(data.restart)
-    this.tags = new GuildTagsConfig(data.tags)
-  }
-}
-
-class GuildRestartConfig {
-  public readonly channel: Snowflake
-  public readonly user?: Snowflake
-
-  public constructor(data: RawConfig["guild"]["restart"]) {
-    this.channel = data.channel
-    if (data.user) {
-      this.user = data.user
-    }
-  }
-}
-
-class GuildTagsConfig {
-  public readonly awaitingStaff: Snowflake
-  public readonly awaitingUser: Snowflake
-  public readonly closed: Snowflake
-  public readonly open: Snowflake
-
-  public constructor(data: RawConfig["guild"]["tags"]) {
-    this.awaitingStaff = data.awaitingStaff
-    this.awaitingUser = data.awaitingUser
-    this.closed = data.closed
-    this.open = data.open
-  }
-}
-
-class RepositoryConfig {
-  public readonly name: string
-  public readonly owner: string
-
-  public constructor(data: RawConfig["repository"]) {
-    this.name = data.name
-    this.owner = data.owner
-  }
-}
-
-class Config {
-  public readonly bot: BotConfig
-  public readonly guild: GuildConfig
-  public readonly repository: RepositoryConfig
-  public readonly sendPrefixes: string[]
-
-  private constructor(data: RawConfig) {
-    this.bot = new BotConfig(data.bot)
-    this.guild = new GuildConfig(data.guild)
-    this.repository = new RepositoryConfig(data.repository)
-    this.sendPrefixes = data.sendPrefixes
-  }
-
-  public static async load() {
-    return new Config(
-      JSON.parse(await readFile("config.json", "utf-8")) as RawConfig
-    )
-  }
-}
-
-export const DefaultConfig = await Config.load()
+export const Config = await model.parseAsync(
+  JSON.parse(await readFile("config.json", "utf-8"))
+)

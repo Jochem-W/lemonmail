@@ -1,4 +1,4 @@
-import { DefaultConfig } from "./models/config.mjs"
+import { Config } from "./models/config.mjs"
 import { fetchChannel } from "./utilities/discordUtilities.mjs"
 import { makeErrorMessage } from "./utilities/embedUtilities.mjs"
 import { ChannelType, CommandInteraction } from "discord.js"
@@ -234,7 +234,7 @@ export async function logError(client: Client<true>, error: Error) {
   console.error(error)
   const channel = await fetchChannel(
     client,
-    DefaultConfig.guild.errorChannel,
+    Config.channels.error,
     ChannelType.GuildText
   )
   await channel.send(makeErrorMessage(error))

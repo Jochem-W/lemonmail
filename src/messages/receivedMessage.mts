@@ -1,4 +1,4 @@
-import { DefaultConfig } from "../models/config.mjs"
+import { Config } from "../models/config.mjs"
 import { displayName } from "../utilities/discordUtilities.mjs"
 import {
   attachmentsToEmbeds,
@@ -8,7 +8,7 @@ import { EmbedBuilder, Message } from "discord.js"
 import type { EmbedFooterOptions } from "discord.js"
 
 export async function receivedMessage(message: Message, prefix?: string) {
-  const guild = await message.client.guilds.fetch(DefaultConfig.guild.id)
+  const guild = await message.client.guilds.fetch(Config.guild)
 
   const colour = message.inGuild() ? 0xff4000 : 0x20ff20
 

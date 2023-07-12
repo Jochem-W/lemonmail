@@ -1,7 +1,7 @@
 import { Prisma } from "../clients.mjs"
 import { RegisteredCommands } from "../commands.mjs"
 import { CommandNotFoundByNameError } from "../errors.mjs"
-import { DefaultConfig } from "../models/config.mjs"
+import { Config } from "../models/config.mjs"
 import { displayName } from "../utilities/discordUtilities.mjs"
 import type { GuildMember } from "discord.js"
 import {
@@ -14,23 +14,20 @@ import {
 } from "discord.js"
 
 function formatPrefixes() {
-  if (DefaultConfig.sendPrefixes.length === 0) {
+  if (Config.sendPrefixes.length === 0) {
     return ""
   }
 
-  if (
-    DefaultConfig.sendPrefixes.length === 1 &&
-    DefaultConfig.sendPrefixes[0]
-  ) {
-    return inlineCode(DefaultConfig.sendPrefixes[0].trim())
+  if (Config.sendPrefixes.length === 1 && Config.sendPrefixes[0]) {
+    return inlineCode(Config.sendPrefixes[0].trim())
   }
 
-  const commaSeparated = DefaultConfig.sendPrefixes
+  const commaSeparated = Config.sendPrefixes
     .slice(undefined, -1)
     .map(inlineCode)
     .join(", ")
 
-  const lastPrefix = DefaultConfig.sendPrefixes.at(-1)
+  const lastPrefix = Config.sendPrefixes.at(-1)
   if (!lastPrefix) {
     return commaSeparated
   }

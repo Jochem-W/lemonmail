@@ -16,22 +16,22 @@
     }
   },
   "dependencies": {
-    "@octokit/rest": "^19.0.13",
-    "@prisma/client": "^4.16.2",
-    "discord.js": "14.11.1-dev.1688213081-75d91b5.0"
+    "@octokit/rest": "^20.0.1",
+    "@prisma/client": "^5.0.0",
+    "discord.js": "dev"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@tsconfig/esm": "^1.0.4",
     "@tsconfig/node20": "^1.0.2",
     "@tsconfig/strictest": "^2.0.1",
-    "@types/node": "^20.3.3",
-    "@typescript-eslint/eslint-plugin": "^5.60.1",
-    "@typescript-eslint/parser": "^5.60.1",
+    "@types/node": "^20.4.1",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",
     "prettier": "^2.8.8",
-    "prisma": "^4.16.2",
+    "prisma": "^5.0.0",
     "typescript": "^5.1.6"
   },
   "optionalDependencies": {

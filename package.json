@@ -16,7 +16,7 @@
     }
   },
   "dependencies": {
-    "@octokit/rest": "^19.0.13",
+    "@octokit/rest": "^20.0.1",
     "@prisma/client": "^4.16.2",
     "discord.js": "14.11.1-dev.1688213081-75d91b5.0"
   },

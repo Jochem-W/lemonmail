@@ -1,16 +1,13 @@
-import { UserContextMenuCommand } from "../models/userContextMenuCommand.mjs"
+import { contextMenuCommand } from "../models/contextMenuCommand.mjs"
 import { block } from "./blockCommand.mjs"
-import {
-  PermissionFlagsBits,
-  UserContextMenuCommandInteraction,
-} from "discord.js"
+import { ApplicationCommandType, PermissionFlagsBits } from "discord.js"
 
-export class BlockContextCommand extends UserContextMenuCommand {
-  public constructor() {
-    super("Block", PermissionFlagsBits.ModerateMembers)
-  }
-
-  public async handle(interaction: UserContextMenuCommandInteraction) {
-    await block(interaction)
-  }
-}
+export const BlockContextCommand = contextMenuCommand({
+  type: ApplicationCommandType.User,
+  name: "Block",
+  defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
+  dmPermission: false,
+  async handle(interaction, user) {
+    await interaction.reply(await block(user))
+  },
+})

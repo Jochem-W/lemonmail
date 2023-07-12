@@ -1,83 +1,132 @@
+import { RegisteredCommands } from "../commands.mjs"
+import { Components } from "../components.mjs"
 import {
-  ButtonNotFoundError,
+  CommandNotFoundError,
+  CommandTypeMismatchError,
+  ComponentNotFoundError,
+  ComponentTypeMismatchError,
   InvalidCustomIdError,
-  reportError,
-  UnregisteredNameError,
+  ModalNotFoundError,
+  logError,
 } from "../errors.mjs"
-import { RegisteredButtons, RegisteredModals } from "../interactable.mjs"
-import { InteractionScope, stringToCustomId } from "../models/customId.mjs"
-import type { Handler } from "../types/handler.mjs"
-import { makeErrorEmbed } from "../utilities/embedUtilities.mjs"
-import { MessageComponentInteraction, ModalSubmitInteraction } from "discord.js"
-import type { Interaction } from "discord.js"
+import { Modals } from "../modals.mjs"
+import { handler } from "../models/handler.mjs"
+import { makeErrorMessage } from "../utilities/embedUtilities.mjs"
+import {
+  AutocompleteInteraction,
+  CommandInteraction,
+  InteractionType,
+  MessageComponentInteraction,
+  ModalSubmitInteraction,
+} from "discord.js"
 
-export class InteractionHandler implements Handler<"interactionCreate"> {
-  public readonly event = "interactionCreate"
-  public readonly once = false
-
-  private static async handleMessageComponent(
-    interaction: MessageComponentInteraction
-  ) {
-    const data = stringToCustomId(interaction.customId)
-    if (data.scope !== InteractionScope.Button) {
-      return
-    }
-
-    if (!interaction.isButton()) {
-      throw new InvalidCustomIdError(data)
-    }
-
-    const button = RegisteredButtons.get(data.name)
-    if (!button) {
-      throw new ButtonNotFoundError(data)
-    }
-
-    await button(interaction, data.args)
+async function handleCommand(interaction: CommandInteraction) {
+  const command = RegisteredCommands.get(interaction.commandId)
+  if (!command) {
+    throw new CommandNotFoundError(interaction.commandId)
   }
 
-  private static async handleModalSubmit(interaction: ModalSubmitInteraction) {
-    const data = stringToCustomId(interaction.customId)
-    if (data.scope !== InteractionScope.Modal) {
-      return
-    }
-
-    const modal = RegisteredModals.get(data.name)
-    if (!modal) {
-      throw new UnregisteredNameError("modal", data.name)
-    }
-
-    await modal(interaction, data.args)
+  if (command.type !== interaction.commandType) {
+    throw new CommandTypeMismatchError(
+      interaction.commandId,
+      interaction.commandType,
+      command.type
+    )
   }
 
-  public async handle(interaction: Interaction) {
-    if (interaction instanceof MessageComponentInteraction) {
-      try {
-        await InteractionHandler.handleMessageComponent(interaction)
-      } catch (e) {
-        if (!(e instanceof Error)) {
-          throw e
-        }
-
-        await reportError(e)
-        await interaction.editReply({ embeds: [makeErrorEmbed(e)] })
-      }
-
-      return
-    }
-
-    if (interaction instanceof ModalSubmitInteraction) {
-      try {
-        await InteractionHandler.handleModalSubmit(interaction)
-      } catch (e) {
-        if (!(e instanceof Error)) {
-          throw e
-        }
-
-        await reportError(e)
-        await interaction.editReply({ embeds: [makeErrorEmbed(e)] })
-      }
-
-      return
-    }
-  }
+  await command.handle(interaction as never)
 }
+
+async function handleComponent(interaction: MessageComponentInteraction) {
+  const [componentName] = interaction.customId.split(":")
+  if (!componentName) {
+    throw new InvalidCustomIdError(interaction.customId)
+  }
+
+  const component = Components.get(componentName)
+  if (!component) {
+    throw new ComponentNotFoundError(componentName)
+  }
+
+  if (component.type !== interaction.componentType) {
+    throw new ComponentTypeMismatchError(
+      componentName,
+      interaction.componentType,
+      component.type
+    )
+  }
+
+  await component.handle(interaction as never)
+}
+
+async function handleAutocomplete(interaction: AutocompleteInteraction) {
+  const command = RegisteredCommands.get(interaction.commandId)
+  if (!command) {
+    throw new CommandNotFoundError(interaction.commandId)
+  }
+
+  if (command.type !== interaction.commandType) {
+    throw new CommandTypeMismatchError(
+      interaction.commandId,
+      interaction.commandType,
+      command.type
+    )
+  }
+
+  await command.autocomplete(interaction)
+}
+
+async function handleModal(interaction: ModalSubmitInteraction) {
+  const [modalName] = interaction.customId.split(":")
+  if (!modalName) {
+    throw new InvalidCustomIdError(interaction.customId)
+  }
+
+  const modal = Modals.get(modalName)
+  if (!modal) {
+    throw new ModalNotFoundError(modalName)
+  }
+
+  await modal(interaction)
+}
+
+export const InteractionHandler = handler({
+  event: "interactionCreate",
+  once: false,
+  async handle(interaction) {
+    try {
+      switch (interaction.type) {
+        case InteractionType.ApplicationCommand:
+          await handleCommand(interaction)
+          break
+        case InteractionType.MessageComponent:
+          await handleComponent(interaction)
+          break
+        case InteractionType.ApplicationCommandAutocomplete:
+          await handleAutocomplete(interaction)
+          break
+        case InteractionType.ModalSubmit:
+          await handleModal(interaction)
+          break
+      }
+    } catch (e) {
+      if (!(e instanceof Error)) {
+        throw e
+      }
+
+      await logError(e)
+
+      if (!interaction.isRepliable()) {
+        return
+      }
+
+      const message = makeErrorMessage(e)
+      if (interaction.replied) {
+        await interaction.editReply(message)
+        return
+      }
+
+      await interaction.reply({ ...message, ephemeral: true })
+    }
+  },
+})

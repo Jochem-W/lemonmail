@@ -1,17 +1,14 @@
 import { Prisma } from "../clients.mjs"
-import { ChatInputCommand } from "../models/chatInputCommand.mjs"
+import { slashCommand, slashOption } from "../models/slashCommand.mjs"
 import {
-  ChatInputCommandInteraction,
   EmbedBuilder,
   PermissionFlagsBits,
-  UserContextMenuCommandInteraction,
+  SlashCommandUserOption,
+  User,
   userMention,
 } from "discord.js"
 
-export async function block(
-  interaction: ChatInputCommandInteraction | UserContextMenuCommandInteraction
-) {
-  const user = interaction.options.getUser("user", true)
+export async function block(user: User) {
   let prismaUser = await Prisma.user.findFirst({ where: { id: user.id } })
   if (!prismaUser) {
     prismaUser = await Prisma.user.create({
@@ -25,7 +22,7 @@ export async function block(
   }
 
   const verb = `${prismaUser.blocked ? "" : "un"}blocked`
-  await interaction.reply({
+  return {
     embeds: [
       new EmbedBuilder()
         .setTitle(`User ${verb}`)
@@ -36,25 +33,41 @@ export async function block(
         ),
     ],
     ephemeral: true,
-  })
-}
-
-export class BlockCommand extends ChatInputCommand {
-  public constructor() {
-    super(
-      "block",
-      "Toggles whether a user is able to open modmail threads",
-      PermissionFlagsBits.ModerateMembers
-    )
-    this.builder.addStringOption((builder) =>
-      builder
-        .setName("user")
-        .setDescription("The target user")
-        .setRequired(true)
-    )
-  }
-
-  public async handle(interaction: ChatInputCommandInteraction) {
-    await block(interaction)
   }
 }
+
+// export class BlockCommand extends ChatInputCommand {
+//   public constructor() {
+//     super(
+//       "block",
+//       "Toggles whether a user is able to open modmail threads",
+//       PermissionFlagsBits.ModerateMembers
+//     )
+//     this.builder.addStringOption((builder) =>
+//       builder
+//         .setName("user")
+//         .setDescription("The target user")
+//         .setRequired(true)
+//     )
+//   }
+
+//   public async handle(interaction: ChatInputCommandInteraction) {
+//     await block(interaction)
+//   }
+// }
+
+export const BlockCommand = slashCommand({
+  name: "block",
+  description: "Toggles whether a user is able to open modmail threads",
+  defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
+  dmPermission: false,
+  options: [
+    slashOption(
+      true,
+      new SlashCommandUserOption().setName("user").setDescription("Target user")
+    ),
+  ],
+  async handle(interaction, user) {
+    await interaction.reply(await block(user))
+  },
+})

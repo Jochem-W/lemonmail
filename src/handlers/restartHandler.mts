@@ -1,5 +1,5 @@
 import { Prisma } from "../clients.mjs"
-import type { Handler } from "../types/handler.mjs"
+import { handler } from "../models/handler.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
 import {
   messageIsFromUser,
@@ -8,14 +8,12 @@ import {
   processDmMessage,
   processGuildMessage,
 } from "../utilities/threadUtilities.mjs"
-import type { Client } from "discord.js"
 import { ChannelType } from "discord.js"
 
-export class RestartHandler implements Handler<"ready"> {
-  public readonly event = "ready"
-  public readonly once = true
-
-  public async handle(client: Client) {
+export const RestartHandler = handler({
+  event: "ready",
+  once: true,
+  async handle(client) {
     const threads = await Prisma.thread.findMany({ where: { active: true } })
     for (const thread of threads) {
       const user = await client.users.fetch(thread.userId)
@@ -73,5 +71,5 @@ export class RestartHandler implements Handler<"ready"> {
         await processDmMessage(message)
       }
     }
-  }
-}
+  },
+})

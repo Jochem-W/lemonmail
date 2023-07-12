@@ -1,6 +1,6 @@
 import { Prisma } from "../clients.mjs"
 import { confirmationMessage } from "../messages/confirmationMessage.mjs"
-import type { Handler } from "../types/handler.mjs"
+import { handler } from "../models/handler.mjs"
 import {
   messageIsFromUser,
   messageIsNotEmpty,
@@ -8,13 +8,11 @@ import {
   processDmMessage,
   processGuildMessage,
 } from "../utilities/threadUtilities.mjs"
-import type { Message } from "discord.js"
 
-export class MessageCreateHandler implements Handler<"messageCreate"> {
-  public readonly event = "messageCreate"
-  public readonly once = false
-
-  public async handle(message: Message) {
+export const MessageCreateHandler = handler({
+  event: "messageCreate",
+  once: false,
+  async handle(message) {
     if (!messageIsFromUser(message) || !messageIsNotEmpty(message)) {
       return
     }
@@ -47,5 +45,5 @@ export class MessageCreateHandler implements Handler<"messageCreate"> {
     }
 
     await processGuildMessage(thread, message, prefix)
-  }
-}
+  },
+})

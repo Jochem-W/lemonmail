@@ -3,27 +3,23 @@ import { threadAlreadyExistsMessage } from "../messages/threadAlreadyExistsMessa
 import { threadOpenedMessage } from "../messages/threadOpenedMessage.mjs"
 import { userIsBotMessage } from "../messages/userIsBotMessage.mjs"
 import { userNotInGuildMessage } from "../messages/userNotInGuildMessage.mjs"
-import { UserContextMenuCommand } from "../models/userContextMenuCommand.mjs"
+import { contextMenuCommand } from "../models/contextMenuCommand.mjs"
 import { tryFetchMember } from "../utilities/discordUtilities.mjs"
 import { createThreadFromInteraction } from "../utilities/threadUtilities.mjs"
-import {
-  PermissionFlagsBits,
-  UserContextMenuCommandInteraction,
-} from "discord.js"
+import { ApplicationCommandType, PermissionFlagsBits } from "discord.js"
 
-export class OpenContextCommand extends UserContextMenuCommand {
-  public constructor() {
-    super("Open modmail thread", PermissionFlagsBits.ModerateMembers)
-  }
-
-  public async handle(interaction: UserContextMenuCommandInteraction) {
-    await interaction.deferReply({ ephemeral: true })
-
-    const user = interaction.targetUser
+export const OpenContextCommand = contextMenuCommand({
+  type: ApplicationCommandType.User,
+  name: "Open modmail thread",
+  defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
+  dmPermission: false,
+  async handle(interaction, user) {
     if (user.bot) {
-      await interaction.editReply(userIsBotMessage(user))
+      await interaction.reply({ ...userIsBotMessage(user), ephemeral: true })
       return
     }
+
+    await interaction.deferReply({ ephemeral: true })
 
     let thread = await Prisma.thread.findFirst({
       where: { userId: user.id, active: true },
@@ -42,5 +38,5 @@ export class OpenContextCommand extends UserContextMenuCommand {
     thread = await createThreadFromInteraction(member, interaction)
 
     await interaction.editReply(threadOpenedMessage(thread))
-  }
-}
+  },
+})

@@ -1,11 +1,16 @@
-import { createThreadButton } from "../buttons/createThreadButton.mjs"
-import { Discord } from "../clients.mjs"
+import { Discord, Prisma } from "../clients.mjs"
+import { component } from "../models/component.mjs"
 import { DefaultConfig } from "../models/config.mjs"
-import { button } from "../utilities/button.mjs"
+import { fetchChannel } from "../utilities/discordUtilities.mjs"
+import { processDmMessage } from "../utilities/threadUtilities.mjs"
+import { blockedMessage } from "./blockedMessage.mjs"
+import { dmThreadExistsMessage } from "./dmThreadExistsMessage.mjs"
 import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ChannelType,
+  ComponentType,
   EmbedBuilder,
   Message,
 } from "discord.js"
@@ -15,6 +20,51 @@ import type {
 } from "discord.js"
 
 const guild = await Discord.guilds.fetch(DefaultConfig.guild.id)
+
+const createThreadButton = component({
+  type: ComponentType.Button,
+  name: "create-thread",
+  async handle(interaction, type, channelId, messageId) {
+    const rows = interaction.message.components.map(
+      (row) =>
+        new ActionRowBuilder<MessageActionRowComponentBuilder>(row.toJSON())
+    )
+
+    for (const row of rows) {
+      for (const component of row.components) {
+        component.setDisabled(true)
+      }
+    }
+
+    if (type === "no") {
+      await interaction.update({ components: rows })
+      return
+    }
+
+    const prismaUser = await Prisma.user.findFirst({
+      where: { id: interaction.user.id },
+    })
+    if (prismaUser?.blocked) {
+      await interaction.reply(blockedMessage())
+      return
+    }
+
+    const thread = await Prisma.thread.findFirst({
+      where: { userId: interaction.user.id, active: true },
+    })
+
+    if (thread) {
+      await interaction.reply(dmThreadExistsMessage())
+      return
+    }
+
+    await interaction.update({ components: rows })
+
+    const channel = await fetchChannel(channelId, ChannelType.DM)
+    const message = await channel.messages.fetch(messageId) // TODO
+    await processDmMessage(message)
+  },
+})
 
 export function confirmationMessage(message: Message) {
   const footer: EmbedFooterOptions = { text: guild.name }
@@ -39,14 +89,12 @@ export function confirmationMessage(message: Message) {
           .setStyle(ButtonStyle.Primary)
           .setLabel("Yes")
           .setCustomId(
-            button(createThreadButton, ["yes", message.channel.id, message.id])
+            createThreadButton("yes", message.channelId, message.id)
           ),
         new ButtonBuilder()
           .setStyle(ButtonStyle.Secondary)
           .setLabel("No")
-          .setCustomId(
-            button(createThreadButton, ["no", message.channel.id, message.id])
-          )
+          .setCustomId(createThreadButton("no", message.channelId, message.id))
       ),
     ],
   }

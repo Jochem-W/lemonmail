@@ -1,21 +1,14 @@
 import { Prisma } from "../clients.mjs"
-import { ChatInputCommand } from "../models/chatInputCommand.mjs"
-import {
-  ChatInputCommandInteraction,
-  EmbedBuilder,
-  PermissionFlagsBits,
-} from "discord.js"
+import { slashCommand } from "../models/slashCommand.mjs"
+import { EmbedBuilder, PermissionFlagsBits } from "discord.js"
 
-export class ThreadAutoAddCommand extends ChatInputCommand {
-  public constructor() {
-    super(
-      "thread-auto-add",
-      "Toggles whether you want to be added to new modmail threads",
-      PermissionFlagsBits.ModerateMembers
-    )
-  }
-
-  public async handle(interaction: ChatInputCommandInteraction) {
+export const ThreadAutoAddCommand = slashCommand({
+  name: "thread-auto-add",
+  description:
+    "Toggles whether you're automatically added to new modmail threads",
+  defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
+  dmPermission: false,
+  async handle(interaction) {
     await interaction.deferReply({ ephemeral: true })
 
     let staffMember = await Prisma.staffMember.findFirst({
@@ -44,5 +37,5 @@ export class ThreadAutoAddCommand extends ChatInputCommand {
           ),
       ],
     })
-  }
-}
+  },
+})

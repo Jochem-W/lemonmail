@@ -1,8 +1,8 @@
 import { Discord, Prisma } from "../clients.mjs"
 import { invalidThreadMessage } from "../messages/invalidThreadMessage.mjs"
 import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
-import { ChatInputCommand } from "../models/chatInputCommand.mjs"
 import { DefaultConfig } from "../models/config.mjs"
+import { slashCommand, slashOption } from "../models/slashCommand.mjs"
 import {
   displayName,
   fetchChannel,
@@ -11,33 +11,29 @@ import {
 import {
   bold,
   ChannelType,
-  ChatInputCommandInteraction,
   DiscordAPIError,
   EmbedBuilder,
   PermissionFlagsBits,
   RESTJSONErrorCodes,
+  SlashCommandStringOption,
 } from "discord.js"
 
-export class CloseCommand extends ChatInputCommand {
-  public constructor() {
-    super(
-      "close",
-      "Close the current thread",
-      PermissionFlagsBits.ModerateMembers
-    )
-    this.builder.addStringOption((builder) =>
-      builder
+export const CloseCommand = slashCommand({
+  name: "close",
+  description: "Close the current thread",
+  defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
+  dmPermission: false,
+  options: [
+    slashOption(
+      false,
+      new SlashCommandStringOption()
         .setName("reason")
         .setDescription(
           "The reason for closing the thread, not sent to the user"
         )
-        .setRequired(false)
-    )
-  }
-
-  public async handle(interaction: ChatInputCommandInteraction) {
-    const reason = interaction.options.getString("reason")
-
+    ),
+  ],
+  async handle(interaction, reason) {
     const thread = await Prisma.thread.findFirst({
       where: { id: interaction.channelId, active: true },
     })
@@ -109,5 +105,5 @@ export class CloseCommand extends ChatInputCommand {
     )
     await channel.setLocked(true, "Thread was closed manually")
     await channel.setArchived(true, "Thread was closed manually")
-  }
-}
+  },
+})

@@ -1,14 +1,12 @@
 import { Prisma } from "../clients.mjs"
-import type { Handler } from "../types/handler.mjs"
+import { handler } from "../models/handler.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
-import type { Typing } from "discord.js"
 import { ChannelType } from "discord.js"
 
-export class TypingHandler implements Handler<"typingStart"> {
-  public readonly event = "typingStart"
-  public readonly once = false
-
-  public async handle(typing: Typing) {
+export const TypingHandler = handler({
+  event: "typingStart",
+  once: false,
+  async handle(typing) {
     const thread = await Prisma.thread.findFirst({
       where: { userId: typing.user.id, active: true },
     })
@@ -21,5 +19,5 @@ export class TypingHandler implements Handler<"typingStart"> {
       ChannelType.PublicThread
     )
     await threadChannel.sendTyping()
-  }
-}
+  },
+})

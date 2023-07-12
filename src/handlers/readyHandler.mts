@@ -1,27 +1,20 @@
 import { Discord } from "../clients.mjs"
-import { reportError } from "../errors.mjs"
+import { logError } from "../errors.mjs"
 import { DefaultConfig } from "../models/config.mjs"
-import type { Handler } from "../types/handler.mjs"
+import { handler } from "../models/handler.mjs"
 import { fetchChannel, uniqueName } from "../utilities/discordUtilities.mjs"
 import { Variables } from "../variables.mjs"
 import { Octokit } from "@octokit/rest"
-import {
-  ChannelType,
-  Client,
-  codeBlock,
-  EmbedBuilder,
-  userMention,
-} from "discord.js"
+import { ChannelType, codeBlock, EmbedBuilder, userMention } from "discord.js"
 import type { MessageCreateOptions } from "discord.js"
 import { mkdir, readFile, writeFile } from "fs/promises"
 
 type State = "UP" | "DOWN" | "RECREATE"
 
-export class ReadyHandler implements Handler<"ready"> {
-  public readonly event = "ready"
-  public readonly once = true
-
-  public async handle(client: Client<true>) {
+export const ReadyHandler = handler({
+  event: "ready",
+  once: true,
+  async handle(client) {
     console.log(`Running as: ${uniqueName(client.user)}`)
 
     client.user.setActivity({ name: "DM to contact staff!" })
@@ -63,8 +56,8 @@ export class ReadyHandler implements Handler<"ready"> {
 
     process.on("SIGINT", () => exitListener())
     process.on("SIGTERM", () => exitListener())
-  }
-}
+  },
+})
 
 async function getChangelog() {
   if (!Variables.commitHash) {
@@ -146,7 +139,7 @@ function exitListener() {
   Discord.destroy()
     .then(() => setState("DOWN"))
     .catch((e) => {
-      e instanceof Error ? void reportError(e) : console.error(e)
+      e instanceof Error ? void logError(e) : console.error(e)
     })
 }
 

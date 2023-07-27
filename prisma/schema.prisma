@@ -17,10 +17,12 @@ model Thread {
   id String @id
 
   userId       String
-  active       Boolean? @unique
+  active       Boolean?
   source       Source
   closedReason String?
   lastMessage  String
+
+  @@unique([userId, active])
 }
 
 model StaffMember {

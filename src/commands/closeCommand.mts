@@ -74,7 +74,7 @@ export const CloseCommand = slashCommand({
 
     await Prisma.thread.update({
       where: { id: thread.id },
-      data: { active: false, closedReason: reason },
+      data: { active: null, closedReason: reason },
     })
 
     await interaction.editReply(

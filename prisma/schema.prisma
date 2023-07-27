@@ -17,7 +17,7 @@ model Thread {
   id String @id
 
   userId       String
-  active       Boolean
+  active       Boolean? @unique
   source       Source
   closedReason String?
   lastMessage  String

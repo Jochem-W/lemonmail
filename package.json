@@ -4,22 +4,11 @@
   "main": "dist/index.mjs",
   "author": "Jochem-W",
   "license": "AGPL-3.0-only",
-  "pnpm": {
-    "overrides": {
-      "discord.js": "dev",
-      "@discordjs/builders": "dev",
-      "@discordjs/collection": "dev",
-      "@discordjs/formatters": "dev",
-      "@discordjs/util": "dev",
-      "@discordjs/rest": "dev",
-      "@discordjs/ws": "dev"
-    }
-  },
   "dependencies": {
     "@octokit/rest": "^20.0.1",
-    "@prisma/client": "^5.0.0",
+    "@prisma/client": "^5.1.0",
     "camelcase-keys": "^8.0.2",
-    "discord.js": "dev",
+    "discord.js": "^14.12.1",
     "zod": "^3.21.4"
   },
   "devDependencies": {
@@ -28,12 +17,12 @@
     "@tsconfig/node20": "^20.1.0",
     "@tsconfig/strictest": "^2.0.1",
     "@types/node": "^20.4.5",
-    "@typescript-eslint/eslint-plugin": "^6.2.0",
-    "@typescript-eslint/parser": "^6.2.0",
-    "eslint": "^8.45.0",
+    "@typescript-eslint/eslint-plugin": "^6.2.1",
+    "@typescript-eslint/parser": "^6.2.1",
+    "eslint": "^8.46.0",
     "eslint-config-prettier": "^8.9.0",
     "prettier": "^3.0.0",
-    "prisma": "^5.0.0",
+    "prisma": "^5.1.0",
     "typescript": "^5.1.6"
   },
   "optionalDependencies": {

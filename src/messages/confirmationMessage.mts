@@ -76,7 +76,7 @@ const createThreadButton = component({
         throw e
       }
 
-      await interaction.reply(dmThreadExistsMessage())
+      await interaction.followUp(dmThreadExistsMessage())
     }
   },
 })

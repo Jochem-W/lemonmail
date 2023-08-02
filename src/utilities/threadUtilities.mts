@@ -12,7 +12,7 @@ import {
   tryFetchMember,
 } from "./discordUtilities.mjs"
 import type { Thread } from "@prisma/client"
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
+import { Prisma } from "@prisma/client"
 import type { CommandInteraction, GuildMember } from "discord.js"
 import {
   AttachmentBuilder,
@@ -74,7 +74,10 @@ export async function createThreadFromMessage(message: Message) {
       },
     })
   } catch (e) {
-    if (e instanceof PrismaClientKnownRequestError && e.code === "P2002") {
+    if (
+      e instanceof Prisma.PrismaClientKnownRequestError &&
+      e.code === "P2002"
+    ) {
       await channel.delete()
     }
 
@@ -133,7 +136,10 @@ export async function createThreadFromInteraction(
       },
     })
   } catch (e) {
-    if (e instanceof PrismaClientKnownRequestError && e.code === "P2002") {
+    if (
+      e instanceof Prisma.PrismaClientKnownRequestError &&
+      e.code === "P2002"
+    ) {
       await channel.delete()
     }
 

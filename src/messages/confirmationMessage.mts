@@ -5,6 +5,7 @@ import { fetchChannel } from "../utilities/discordUtilities.mjs"
 import { processDmMessage } from "../utilities/threadUtilities.mjs"
 import { blockedMessage } from "./blockedMessage.mjs"
 import { dmThreadExistsMessage } from "./dmThreadExistsMessage.mjs"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -64,7 +65,16 @@ const createThreadButton = component({
       ChannelType.DM
     )
     const message = await channel.messages.fetch(messageId) // TODO
+
+    try {
     await processDmMessage(message)
+    } catch (e) {
+      if (!(e instanceof PrismaClientKnownRequestError) || e.code !== "P2002") {
+        throw e
+      }
+
+      await interaction.reply(dmThreadExistsMessage())
+    }
   },
 })
 

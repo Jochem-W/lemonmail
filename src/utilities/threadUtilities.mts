@@ -12,6 +12,7 @@ import {
   tryFetchMember,
 } from "./discordUtilities.mjs"
 import type { Thread } from "@prisma/client"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import type { CommandInteraction, GuildMember } from "discord.js"
 import {
   AttachmentBuilder,
@@ -61,6 +62,25 @@ export async function createThreadFromMessage(message: Message) {
     appliedTags: [Config.tags.open, Config.tags.awaitingStaff],
   })
 
+  let thread
+  try {
+    thread = await Prisma.thread.create({
+      data: {
+        id: channel.id,
+        userId: member.id,
+        active: true,
+        source: "DM",
+        lastMessage: message.id, // TODO: this is technically wrong
+      },
+    })
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError && e.code === "P2002") {
+      await channel.delete()
+    }
+
+    throw e
+  }
+
   await channel.messages.pin(channel.id, "Make the message more easy to find")
 
   const staffMembers = await Prisma.staffMember.findMany({
@@ -72,16 +92,6 @@ export async function createThreadFromMessage(message: Message) {
       "Staff member has opted in to pings"
     )
   }
-
-  const thread = await Prisma.thread.create({
-    data: {
-      id: channel.id,
-      userId: member.id,
-      active: true,
-      source: "DM",
-      lastMessage: message.id, // TODO: this is technically wrong
-    },
-  })
 
   await member.send(
     await threadStatusMessage(
@@ -111,6 +121,25 @@ export async function createThreadFromInteraction(
     appliedTags: [Config.tags.open, Config.tags.awaitingStaff],
   })
 
+  let thread
+  try {
+    thread = await Prisma.thread.create({
+    data: {
+      id: channel.id,
+      userId: member.id,
+      active: true,
+      source: "GUILD",
+      lastMessage: interaction.id,
+    },
+  })
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError && e.code === "P2002") {
+      await channel.delete()
+    }
+
+    throw e
+  }
+
   await channel.messages.pin(channel.id, "Make the message more easy to find")
 
   const staffMembers = await Prisma.staffMember.findMany({
@@ -122,16 +151,6 @@ export async function createThreadFromInteraction(
       "Staff member has opted in to pings"
     )
   }
-
-  const thread = await Prisma.thread.create({
-    data: {
-      id: channel.id,
-      userId: member.id,
-      active: true,
-      source: "GUILD",
-      lastMessage: interaction.id,
-    },
-  })
 
   try {
     await member.send(

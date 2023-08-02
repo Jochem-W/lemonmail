@@ -1,4 +1,4 @@
-import { Prisma } from "../clients.mjs"
+import { ORM } from "../clients.mjs"
 import { invalidThreadMessage } from "../messages/invalidThreadMessage.mjs"
 import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
 import { Config } from "../models/config.mjs"
@@ -37,7 +37,7 @@ export const CloseCommand = slashCommand({
   async handle(interaction, reason) {
     const guild = await interactionGuild(interaction, true)
 
-    const thread = await Prisma.thread.findFirst({
+    const thread = await ORM.thread.findFirst({
       where: { id: interaction.channelId, active: true },
     })
     if (!thread) {
@@ -72,7 +72,7 @@ export const CloseCommand = slashCommand({
 
     await interaction.deferReply()
 
-    await Prisma.thread.update({
+    await ORM.thread.update({
       where: { id: thread.id },
       data: { active: null, closedReason: reason },
     })

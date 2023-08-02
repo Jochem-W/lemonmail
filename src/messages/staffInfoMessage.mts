@@ -1,4 +1,4 @@
-import { Prisma } from "../clients.mjs"
+import { ORM } from "../clients.mjs"
 import { RegisteredCommands } from "../commands.mjs"
 import { CommandNotFoundByNameError } from "../errors.mjs"
 import { Config } from "../models/config.mjs"
@@ -36,7 +36,7 @@ function formatPrefixes() {
 }
 
 export async function staffInfoMessage(member: GuildMember) {
-  const threads = await Prisma.thread.findMany({ where: { userId: member.id } })
+  const threads = await ORM.thread.findMany({ where: { userId: member.id } })
 
   const roles = [...member.roles.cache.values()]
 

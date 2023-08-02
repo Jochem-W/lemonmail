@@ -1,4 +1,4 @@
-import { Prisma } from "../clients.mjs"
+import { ORM } from "../clients.mjs"
 import { confirmationMessage } from "../messages/confirmationMessage.mjs"
 import { handler } from "../models/handler.mjs"
 import {
@@ -18,7 +18,7 @@ export const MessageCreateHandler = handler({
     }
 
     if (!message.inGuild()) {
-      const thread = await Prisma.thread.findFirst({
+      const thread = await ORM.thread.findFirst({
         where: { userId: message.author.id, active: true },
       })
 
@@ -31,7 +31,7 @@ export const MessageCreateHandler = handler({
       return
     }
 
-    const thread = await Prisma.thread.findFirst({
+    const thread = await ORM.thread.findFirst({
       where: { id: message.channelId, active: true },
     })
 

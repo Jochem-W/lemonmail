@@ -1,4 +1,4 @@
-import { Prisma } from "../clients.mjs"
+import { ORM } from "../clients.mjs"
 import { handler } from "../models/handler.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
 import {
@@ -14,7 +14,7 @@ export const RestartHandler = handler({
   event: "ready",
   once: true,
   async handle(client) {
-    const threads = await Prisma.thread.findMany({ where: { active: true } })
+    const threads = await ORM.thread.findMany({ where: { active: true } })
     for (const thread of threads) {
       const user = await client.users.fetch(thread.userId)
       const dmChannel = user.dmChannel ?? (await user.createDM())

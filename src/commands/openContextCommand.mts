@@ -1,4 +1,4 @@
-import { Prisma } from "../clients.mjs"
+import { ORM } from "../clients.mjs"
 import { threadAlreadyExistsMessage } from "../messages/threadAlreadyExistsMessage.mjs"
 import { threadOpenedMessage } from "../messages/threadOpenedMessage.mjs"
 import { userIsBotMessage } from "../messages/userIsBotMessage.mjs"
@@ -24,7 +24,7 @@ export const OpenContextCommand = contextMenuCommand({
 
     await interaction.deferReply({ ephemeral: true })
 
-    let thread = await Prisma.thread.findFirst({
+    let thread = await ORM.thread.findFirst({
       where: { userId: user.id, active: true },
     })
     if (thread) {

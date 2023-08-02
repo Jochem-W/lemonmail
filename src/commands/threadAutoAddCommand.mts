@@ -1,4 +1,4 @@
-import { Prisma } from "../clients.mjs"
+import { ORM } from "../clients.mjs"
 import { slashCommand } from "../models/slashCommand.mjs"
 import { EmbedBuilder, PermissionFlagsBits } from "discord.js"
 
@@ -11,16 +11,16 @@ export const ThreadAutoAddCommand = slashCommand({
   async handle(interaction) {
     await interaction.deferReply({ ephemeral: true })
 
-    let staffMember = await Prisma.staffMember.findFirst({
+    let staffMember = await ORM.staffMember.findFirst({
       where: { id: interaction.user.id },
     })
 
     if (!staffMember) {
-      staffMember = await Prisma.staffMember.create({
+      staffMember = await ORM.staffMember.create({
         data: { id: interaction.user.id, addToThread: true },
       })
     } else {
-      staffMember = await Prisma.staffMember.update({
+      staffMember = await ORM.staffMember.update({
         where: { id: staffMember.id },
         data: { addToThread: !staffMember.addToThread },
       })

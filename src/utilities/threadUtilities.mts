@@ -1,4 +1,4 @@
-import { Prisma } from "../clients.mjs"
+import { ORM } from "../clients.mjs"
 import { dmsDisabledMessage } from "../messages/dmsDisabledMessage.mjs"
 import { memberLeftMessage } from "../messages/memberLeftMessage.mjs"
 import { receivedMessage } from "../messages/receivedMessage.mjs"
@@ -64,7 +64,7 @@ export async function createThreadFromMessage(message: Message) {
 
   let thread
   try {
-    thread = await Prisma.thread.create({
+    thread = await ORM.thread.create({
       data: {
         id: channel.id,
         userId: member.id,
@@ -83,7 +83,7 @@ export async function createThreadFromMessage(message: Message) {
 
   await channel.messages.pin(channel.id, "Make the message more easy to find")
 
-  const staffMembers = await Prisma.staffMember.findMany({
+  const staffMembers = await ORM.staffMember.findMany({
     where: { addToThread: true },
   })
   for (const staffMember of staffMembers) {
@@ -123,7 +123,7 @@ export async function createThreadFromInteraction(
 
   let thread
   try {
-    thread = await Prisma.thread.create({
+    thread = await ORM.thread.create({
       data: {
         id: channel.id,
         userId: member.id,
@@ -142,7 +142,7 @@ export async function createThreadFromInteraction(
 
   await channel.messages.pin(channel.id, "Make the message more easy to find")
 
-  const staffMembers = await Prisma.staffMember.findMany({
+  const staffMembers = await ORM.staffMember.findMany({
     where: { addToThread: true },
   })
   for (const staffMember of staffMembers) {
@@ -198,7 +198,7 @@ export async function processGuildMessage(
     }
 
     await message.channel.send(dmsDisabledMessage(member, message))
-    await Prisma.thread.update({
+    await ORM.thread.update({
       where: { id: thread.id },
       data: { lastMessage: message.id },
     })
@@ -208,7 +208,7 @@ export async function processGuildMessage(
   await message.channel.send(await sentMessage(message, prefix))
   await message.delete()
 
-  await Prisma.thread.update({
+  await ORM.thread.update({
     where: { id: thread.id },
     data: { lastMessage: message.id },
   })
@@ -229,7 +229,7 @@ export async function processGuildMessage(
 }
 
 export async function processDmMessage(message: Message) {
-  let thread = await Prisma.thread.findFirst({
+  let thread = await ORM.thread.findFirst({
     where: { userId: message.author.id, active: true },
   })
 
@@ -256,7 +256,7 @@ export async function processDmMessage(message: Message) {
     }
   }
 
-  await Prisma.thread.update({
+  await ORM.thread.update({
     where: { id: thread.id },
     data: { lastMessage: message.id },
   })

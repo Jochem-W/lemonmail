@@ -1,4 +1,4 @@
-import { Prisma } from "../clients.mjs"
+import { ORM } from "../clients.mjs"
 import { slashCommand, slashOption } from "../models/slashCommand.mjs"
 import {
   EmbedBuilder,
@@ -9,13 +9,13 @@ import {
 } from "discord.js"
 
 export async function block(user: User) {
-  let prismaUser = await Prisma.user.findFirst({ where: { id: user.id } })
+  let prismaUser = await ORM.user.findFirst({ where: { id: user.id } })
   if (!prismaUser) {
-    prismaUser = await Prisma.user.create({
+    prismaUser = await ORM.user.create({
       data: { id: user.id, blocked: true },
     })
   } else {
-    prismaUser = await Prisma.user.update({
+    prismaUser = await ORM.user.update({
       where: { id: user.id },
       data: { blocked: !prismaUser.blocked },
     })

@@ -1,4 +1,4 @@
-import { Prisma } from "../clients.mjs"
+import { ORM } from "../clients.mjs"
 import { component } from "../models/component.mjs"
 import { Config } from "../models/config.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
@@ -40,7 +40,7 @@ const createThreadButton = component({
       return
     }
 
-    const prismaUser = await Prisma.user.findFirst({
+    const prismaUser = await ORM.user.findFirst({
       where: { id: interaction.user.id },
     })
     if (prismaUser?.blocked) {
@@ -48,7 +48,7 @@ const createThreadButton = component({
       return
     }
 
-    const thread = await Prisma.thread.findFirst({
+    const thread = await ORM.thread.findFirst({
       where: { userId: interaction.user.id, active: true },
     })
 

@@ -38,7 +38,7 @@ export function attachmentsToEmbeds(message: Message, colour?: number) {
       embeds.push(
         new EmbedBuilder()
           .setImage(`attachment://${attachment.id}_${attachment.name}`)
-          .setColor(colour ?? null)
+          .setColor(colour ?? null),
       )
     }
   }
@@ -50,7 +50,7 @@ export async function createThreadFromMessage(message: Message) {
   const mailForum = await fetchChannel(
     message.client,
     Config.channels.mail,
-    ChannelType.GuildForum
+    ChannelType.GuildForum,
   )
 
   const member = await mailForum.guild.members.fetch(message.author.id)
@@ -89,7 +89,7 @@ export async function createThreadFromMessage(message: Message) {
   for (const staffMember of staffMembers) {
     await channel.members.add(
       staffMember.id,
-      "Staff member has opted in to pings"
+      "Staff member has opted in to pings",
     )
   }
 
@@ -97,8 +97,8 @@ export async function createThreadFromMessage(message: Message) {
     await threadStatusMessage(
       message,
       "opened",
-      "Any messages you send here will be automatically sent to staff."
-    )
+      "Any messages you send here will be automatically sent to staff.",
+    ),
   )
 
   return thread
@@ -106,12 +106,12 @@ export async function createThreadFromMessage(message: Message) {
 
 export async function createThreadFromInteraction(
   member: GuildMember,
-  interaction: CommandInteraction
+  interaction: CommandInteraction,
 ) {
   const mailForum = await fetchChannel(
     member.client,
     Config.channels.mail,
-    ChannelType.GuildForum
+    ChannelType.GuildForum,
   )
 
   const channel = await mailForum.threads.create({
@@ -124,14 +124,14 @@ export async function createThreadFromInteraction(
   let thread
   try {
     thread = await Prisma.thread.create({
-    data: {
-      id: channel.id,
-      userId: member.id,
-      active: true,
-      source: "GUILD",
-      lastMessage: interaction.id,
-    },
-  })
+      data: {
+        id: channel.id,
+        userId: member.id,
+        active: true,
+        source: "GUILD",
+        lastMessage: interaction.id,
+      },
+    })
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === "P2002") {
       await channel.delete()
@@ -148,7 +148,7 @@ export async function createThreadFromInteraction(
   for (const staffMember of staffMembers) {
     await channel.members.add(
       staffMember.id,
-      "Staff member has opted in to pings"
+      "Staff member has opted in to pings",
     )
   }
 
@@ -157,8 +157,8 @@ export async function createThreadFromInteraction(
       await threadStatusMessage(
         interaction,
         "opened",
-        "Any messages you send here will be automatically sent to staff."
-      )
+        "Any messages you send here will be automatically sent to staff.",
+      ),
     )
   } catch (e) {
     if (
@@ -177,7 +177,7 @@ export async function createThreadFromInteraction(
 export async function processGuildMessage(
   thread: Thread,
   message: Message,
-  prefix: string
+  prefix: string,
 ) {
   const guild = await message.client.guilds.fetch(Config.guild)
 
@@ -240,7 +240,7 @@ export async function processDmMessage(message: Message) {
   const channel = await fetchChannel(
     message.client,
     thread.id,
-    ChannelType.PublicThread
+    ChannelType.PublicThread,
   )
 
   await channel.send(await receivedMessage(message))
@@ -274,9 +274,9 @@ export async function renameAttachments(message: Message) {
     message.attachments.map(async (a) => {
       const response = await fetch(a.url)
       return new AttachmentBuilder(response.body as unknown as Stream).setName(
-        `${a.id}_${a.name}`
+        `${a.id}_${a.name}`,
       )
-    })
+    }),
   )
 }
 

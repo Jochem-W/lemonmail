@@ -6,7 +6,7 @@ export function blockedMessage() {
       new EmbedBuilder()
         .setTitle("Unable to create thread")
         .setDescription(
-          "You're currently blocked from creating new modmail threads"
+          "You're currently blocked from creating new modmail threads",
         ),
     ],
   }

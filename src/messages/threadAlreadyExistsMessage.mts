@@ -8,8 +8,8 @@ export function threadAlreadyExistsMessage(thread: Thread) {
         .setTitle("Thread already exists")
         .setDescription(
           `A thread for this member already exists! ${channelMention(
-            thread.id
-          )}`
+            thread.id,
+          )}`,
         )
         .setColor(0xff0000),
     ],

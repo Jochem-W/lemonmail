@@ -19,7 +19,7 @@ export const OpenCommand = slashCommand({
       true,
       new SlashCommandUserOption()
         .setName("user")
-        .setDescription("The user to open a thread for")
+        .setDescription("The user to open a thread for"),
     ),
   ],
   async handle(interaction, user) {

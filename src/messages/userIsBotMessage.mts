@@ -5,8 +5,8 @@ export function userIsBotMessage(user: User) {
     .setTitle("User is a bot")
     .setDescription(
       `A thread can't be created for ${userMention(
-        user.id
-      )} because they're a bot`
+        user.id,
+      )} because they're a bot`,
     )
     .setColor(0xff0000)
 

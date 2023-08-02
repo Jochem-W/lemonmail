@@ -28,8 +28,8 @@ export async function block(user: User) {
         .setTitle(`User ${verb}`)
         .setDescription(
           `${userMention(
-            user.id
-          )} is now ${verb} from making new modmail threads`
+            user.id,
+          )} is now ${verb} from making new modmail threads`,
         ),
     ],
     ephemeral: true,
@@ -64,7 +64,9 @@ export const BlockCommand = slashCommand({
   options: [
     slashOption(
       true,
-      new SlashCommandUserOption().setName("user").setDescription("Target user")
+      new SlashCommandUserOption()
+        .setName("user")
+        .setDescription("Target user"),
     ),
   ],
   async handle(interaction, user) {

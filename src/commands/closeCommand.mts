@@ -30,8 +30,8 @@ export const CloseCommand = slashCommand({
       new SlashCommandStringOption()
         .setName("reason")
         .setDescription(
-          "The reason for closing the thread, not sent to the user"
-        )
+          "The reason for closing the thread, not sent to the user",
+        ),
     ),
   ],
   async handle(interaction, reason) {
@@ -48,7 +48,7 @@ export const CloseCommand = slashCommand({
     const channel = await fetchChannel(
       interaction.client,
       thread.id,
-      ChannelType.PublicThread
+      ChannelType.PublicThread,
     )
     const newName = `${channel.name} (${reason ?? "closed"})`
     if (newName.length > 100) {
@@ -61,7 +61,7 @@ export const CloseCommand = slashCommand({
                 reason ?? ""
               }" is too long, please reduce it to be at most ${
                 100 - newName.length + (reason?.length ?? 0)
-              } characters long`
+              } characters long`,
             )
             .setColor(0xff0000),
         ],
@@ -78,13 +78,13 @@ export const CloseCommand = slashCommand({
     })
 
     await interaction.editReply(
-      await threadStatusMessage(interaction, "closed", reason ?? undefined)
+      await threadStatusMessage(interaction, "closed", reason ?? undefined),
     )
 
     try {
       await interaction.client.users.send(
         thread.userId,
-        await threadStatusMessage(interaction, "closed")
+        await threadStatusMessage(interaction, "closed"),
       )
     } catch (e) {
       if (
@@ -98,17 +98,17 @@ export const CloseCommand = slashCommand({
     await channel.messages.edit(channel.id, {
       content: `${bold(
         displayName(
-          (await tryFetchMember(guild, interaction.user)) ?? interaction.user
-        )
+          (await tryFetchMember(guild, interaction.user)) ?? interaction.user,
+        ),
       )}: [thread closed]`,
     })
     await channel.setName(
       `${channel.name} (${reason ?? "closed"})`,
-      "Thread was closed manually"
+      "Thread was closed manually",
     )
     await channel.setAppliedTags(
       [Config.tags.closed],
-      "Thread was closed manually"
+      "Thread was closed manually",
     )
     await channel.setLocked(true, "Thread was closed manually")
     await channel.setArchived(true, "Thread was closed manually")

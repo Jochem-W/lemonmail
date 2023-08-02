@@ -62,8 +62,8 @@ export async function staffInfoMessage(member: GuildMember) {
         .setDescription(
           `Prefix a message with ${formatPrefixes()} to reply. Use ${chatInputApplicationCommandMention(
             closeCommand.command.builder.name,
-            closeCommand.id
-          )} to close the thread.`
+            closeCommand.id,
+          )} to close the thread.`,
         )
         .setFields(
           { name: "User", value: userMention(member.id) },
@@ -80,7 +80,7 @@ export async function staffInfoMessage(member: GuildMember) {
                 .filter((r) => r.id !== member.guild.roles.everyone.id)
                 .map((r) => roleMention(r.id))
                 .join("\n") || "None",
-          }
+          },
         )
         .setTimestamp(new Date())
         .setColor(0x0040ff),

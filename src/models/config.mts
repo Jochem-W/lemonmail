@@ -20,5 +20,5 @@ const model = z.object({
 })
 
 export const Config = await model.parseAsync(
-  JSON.parse(await readFile("config.json", "utf-8"))
+  JSON.parse(await readFile("config.json", "utf-8")),
 )

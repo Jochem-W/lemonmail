@@ -22,7 +22,7 @@ export const RestartHandler = handler({
       const threadChannel = await fetchChannel(
         client,
         thread.id,
-        ChannelType.PublicThread
+        ChannelType.PublicThread,
       )
 
       const messages = []

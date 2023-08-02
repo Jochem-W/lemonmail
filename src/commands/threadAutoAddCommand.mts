@@ -33,7 +33,7 @@ export const ThreadAutoAddCommand = slashCommand({
           .setDescription(
             `You will now ${
               !staffMember.addToThread ? "no longer" : ""
-            } be added to new modmail threads`
+            } be added to new modmail threads`,
           ),
       ],
     })

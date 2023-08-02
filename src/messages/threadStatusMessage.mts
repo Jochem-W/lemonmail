@@ -6,7 +6,7 @@ import type { EmbedFooterOptions } from "discord.js"
 export async function threadStatusMessage(
   data: CommandInteraction | Message,
   type: "closed" | "opened",
-  reason?: string
+  reason?: string,
 ) {
   const guild = await data.client.guilds.fetch(Config.guild)
 

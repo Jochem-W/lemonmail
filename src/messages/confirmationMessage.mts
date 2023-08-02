@@ -26,7 +26,7 @@ const createThreadButton = component({
   async handle(interaction, type, channelId, messageId) {
     const rows = interaction.message.components.map(
       (row) =>
-        new ActionRowBuilder<MessageActionRowComponentBuilder>(row.toJSON())
+        new ActionRowBuilder<MessageActionRowComponentBuilder>(row.toJSON()),
     )
 
     for (const row of rows) {
@@ -62,12 +62,12 @@ const createThreadButton = component({
     const channel = await fetchChannel(
       interaction.client,
       channelId,
-      ChannelType.DM
+      ChannelType.DM,
     )
     const message = await channel.messages.fetch(messageId) // TODO
 
     try {
-    await processDmMessage(message)
+      await processDmMessage(message)
     } catch (e) {
       if (!(e instanceof PrismaClientKnownRequestError) || e.code !== "P2002") {
         throw e
@@ -92,7 +92,7 @@ export async function confirmationMessage(message: Message) {
       new EmbedBuilder()
         .setTitle("Create a new thread?")
         .setDescription(
-          "You currently don't have an active thread. Would you like to create a new thread using this message?"
+          "You currently don't have an active thread. Would you like to create a new thread using this message?",
         )
         .setFooter(footer)
         .setTimestamp(message.createdAt),
@@ -103,12 +103,12 @@ export async function confirmationMessage(message: Message) {
           .setStyle(ButtonStyle.Primary)
           .setLabel("Yes")
           .setCustomId(
-            createThreadButton("yes", message.channelId, message.id)
+            createThreadButton("yes", message.channelId, message.id),
           ),
         new ButtonBuilder()
           .setStyle(ButtonStyle.Secondary)
           .setLabel("No")
-          .setCustomId(createThreadButton("no", message.channelId, message.id))
+          .setCustomId(createThreadButton("no", message.channelId, message.id)),
       ),
     ],
   }

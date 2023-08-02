@@ -26,17 +26,17 @@ export async function sentMessage(message: Message, prefix?: string) {
     .setTitle("Message sent")
     .setDescription(
       (prefix ? message.content.replace(prefix, "").trim() : message.content) ||
-        null
+        null,
     )
     .setTimestamp(message.createdTimestamp)
     .setColor(colour)
 
   if (message.inGuild()) {
-    const member = await guild.members.fetch(message.author.id)
-    embed.setAuthor({
-      name: displayName(member),
-      iconURL: member.displayAvatarURL(),
-    })
+  const member = await guild.members.fetch(message.author.id)
+  embed.setAuthor({
+    name: displayName(member),
+    iconURL: member.displayAvatarURL(),
+  })
   } else {
     const footer: EmbedFooterOptions = { text: guild.name }
     const iconURL = guild.iconURL()

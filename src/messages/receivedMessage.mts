@@ -37,7 +37,7 @@ export async function receivedMessage(message: Message, prefix?: string) {
     .setTitle("Message received")
     .setDescription(
       (prefix ? message.content.replace(prefix, "").trim() : message.content) ||
-        null
+        null,
     )
     .setTimestamp(message.createdTimestamp)
     .setColor(colour)

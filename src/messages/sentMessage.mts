@@ -31,13 +31,13 @@ export async function sentMessage(message: Message, prefix?: string) {
     .setTimestamp(message.createdTimestamp)
     .setColor(colour)
 
-  if (message.inGuild()) {
   const member = await guild.members.fetch(message.author.id)
   embed.setAuthor({
     name: displayName(member),
     iconURL: member.displayAvatarURL(),
   })
-  } else {
+
+  if (!message.inGuild()) {
     const footer: EmbedFooterOptions = { text: guild.name }
     const iconURL = guild.iconURL()
     if (iconURL) {

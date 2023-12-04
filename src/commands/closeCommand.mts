@@ -16,6 +16,7 @@ import {
   EmbedBuilder,
   PermissionFlagsBits,
   RESTJSONErrorCodes,
+  SlashCommandBooleanOption,
   SlashCommandStringOption,
 } from "discord.js"
 
@@ -33,8 +34,16 @@ export const CloseCommand = slashCommand({
           "The reason for closing the thread, not sent to the user",
         ),
     ),
+    slashOption(
+      false,
+      new SlashCommandBooleanOption()
+        .setName("silent")
+        .setDescription(
+          "Whether to notify the user when the thread is closed; defaults to False",
+        ),
+    ),
   ],
-  async handle(interaction, reason) {
+  async handle(interaction, reason, silent) {
     const guild = await interactionGuild(interaction, true)
 
     const thread = await ORM.thread.findFirst({
@@ -81,17 +90,19 @@ export const CloseCommand = slashCommand({
       await threadStatusMessage(interaction, "closed", reason ?? undefined),
     )
 
-    try {
-      await interaction.client.users.send(
-        thread.userId,
-        await threadStatusMessage(interaction, "closed"),
-      )
-    } catch (e) {
-      if (
-        !(e instanceof DiscordAPIError) ||
-        e.code !== RESTJSONErrorCodes.CannotSendMessagesToThisUser
-      ) {
-        throw e
+    if (silent !== true) {
+      try {
+        await interaction.client.users.send(
+          thread.userId,
+          await threadStatusMessage(interaction, "closed"),
+        )
+      } catch (e) {
+        if (
+          !(e instanceof DiscordAPIError) ||
+          e.code !== RESTJSONErrorCodes.CannotSendMessagesToThisUser
+        ) {
+          throw e
+        }
       }
     }
 

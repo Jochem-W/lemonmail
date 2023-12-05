@@ -42,9 +42,9 @@ devDependencies:
   '@trivago/prettier-plugin-sort-imports':
     specifier: ^4.2.0
     version: 4.2.0(prettier@3.0.3)
-  '@tsconfig/node20':
-    specifier: ^20.1.2
-    version: 20.1.2
+  '@tsconfig/node21':
+    specifier: ^21.0.0
+    version: 21.0.0
   '@tsconfig/strictest':
     specifier: ^2.0.2
     version: 2.0.2
@@ -1162,8 +1162,8 @@ packages:
       - supports-color
     dev: true
 
-  /@tsconfig/node20@20.1.2:
-    resolution: {integrity: sha512-madaWq2k+LYMEhmcp0fs+OGaLFk0OenpHa4gmI4VEmCKX4PJntQ6fnnGADVFrVkBj0wIdAlQnK/MrlYTHsa1gQ==}
+  /@tsconfig/node21@21.0.0:
+    resolution: {integrity: sha512-fMySImjI1muKEV1JAFZfBlgSjLE8EeqNRmdcdyUWDenXyCvWjSE1oGM/nK6ob1fV+lAYlJhhC1b2nrjnDQCOhQ==}
     dev: true
 
   /@tsconfig/strictest@2.0.2:

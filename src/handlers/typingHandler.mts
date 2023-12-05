@@ -9,7 +9,10 @@ export const TypingHandler = handler({
   event: "typingStart",
   once: false,
   async handle(typing) {
-    // TODO: check if DMs
+    if (!typing.channel.isDMBased()) {
+      return
+    }
+
     const [thread] = await Drizzle.select()
       .from(threadsTable)
       .where(

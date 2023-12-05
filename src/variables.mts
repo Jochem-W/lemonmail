@@ -7,6 +7,7 @@ const model = z
     COMMIT_HASH: z.string().optional(),
     GITHUB_TOKEN: z.string().optional(),
     NODE_ENV: z.string().optional().default("development"),
+    DATABASE_URL: z.string(),
   })
   .transform((arg) => camelcaseKeys(arg))
 

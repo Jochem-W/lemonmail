@@ -1,13 +1,15 @@
-import { ORM } from "../clients.mjs"
+import { Drizzle } from "../clients.mjs"
 import { threadAlreadyExistsMessage } from "../messages/threadAlreadyExistsMessage.mjs"
 import { threadOpenedMessage } from "../messages/threadOpenedMessage.mjs"
 import { userIsBotMessage } from "../messages/userIsBotMessage.mjs"
 import { userNotInGuildMessage } from "../messages/userNotInGuildMessage.mjs"
 import { slashCommand, slashOption } from "../models/slashCommand.mjs"
+import { threadsTable } from "../schema.mjs"
 import { tryFetchMember } from "../utilities/discordUtilities.mjs"
 import { interactionGuild } from "../utilities/interactionUtilities.mjs"
 import { createThreadFromInteraction } from "../utilities/threadUtilities.mjs"
 import { PermissionFlagsBits, SlashCommandUserOption } from "discord.js"
+import { and, eq } from "drizzle-orm"
 
 export const OpenCommand = slashCommand({
   name: "open",
@@ -32,9 +34,11 @@ export const OpenCommand = slashCommand({
 
     await interaction.deferReply({ ephemeral: true })
 
-    let thread = await ORM.thread.findFirst({
-      where: { userId: user.id, active: true },
-    })
+    let [thread] = await Drizzle.select()
+      .from(threadsTable)
+      .where(
+        and(eq(threadsTable.userId, user.id), eq(threadsTable.active, true)),
+      )
     if (thread) {
       await interaction.editReply(threadAlreadyExistsMessage(thread))
       return

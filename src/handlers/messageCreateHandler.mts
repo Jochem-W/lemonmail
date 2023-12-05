@@ -1,6 +1,7 @@
-import { ORM } from "../clients.mjs"
+import { Drizzle } from "../clients.mjs"
 import { confirmationMessage } from "../messages/confirmationMessage.mjs"
 import { handler } from "../models/handler.mjs"
+import { threadsTable } from "../schema.mjs"
 import {
   messageIsFromUser,
   messageIsNotEmpty,
@@ -8,6 +9,7 @@ import {
   processDmMessage,
   processGuildMessage,
 } from "../utilities/threadUtilities.mjs"
+import { and, eq } from "drizzle-orm"
 
 export const MessageCreateHandler = handler({
   event: "messageCreate",
@@ -18,9 +20,14 @@ export const MessageCreateHandler = handler({
     }
 
     if (!message.inGuild()) {
-      const thread = await ORM.thread.findFirst({
-        where: { userId: message.author.id, active: true },
-      })
+      const [thread] = await Drizzle.select()
+        .from(threadsTable)
+        .where(
+          and(
+            eq(threadsTable.userId, message.author.id),
+            eq(threadsTable.active, true),
+          ),
+        )
 
       if (!thread) {
         await message.reply(await confirmationMessage(message))
@@ -31,9 +38,14 @@ export const MessageCreateHandler = handler({
       return
     }
 
-    const thread = await ORM.thread.findFirst({
-      where: { id: message.channelId, active: true },
-    })
+    const [thread] = await Drizzle.select()
+      .from(threadsTable)
+      .where(
+        and(
+          eq(threadsTable.id, message.channelId),
+          eq(threadsTable.active, true),
+        ),
+      )
 
     if (!thread) {
       return

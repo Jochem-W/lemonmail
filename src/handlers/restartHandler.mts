@@ -1,5 +1,6 @@
-import { ORM } from "../clients.mjs"
+import { Drizzle } from "../clients.mjs"
 import { handler } from "../models/handler.mjs"
+import { threadsTable } from "../schema.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
 import {
   messageIsFromUser,
@@ -9,12 +10,15 @@ import {
   processGuildMessage,
 } from "../utilities/threadUtilities.mjs"
 import { ChannelType } from "discord.js"
+import { eq } from "drizzle-orm"
 
 export const RestartHandler = handler({
   event: "ready",
   once: true,
   async handle(client) {
-    const threads = await ORM.thread.findMany({ where: { active: true } })
+    const threads = await Drizzle.select()
+      .from(threadsTable)
+      .where(eq(threadsTable.active, true))
     for (const thread of threads) {
       const user = await client.users.fetch(thread.userId)
       const dmChannel = user.dmChannel ?? (await user.createDM())

@@ -1,4 +1,4 @@
-import { ORM } from "../clients.mjs"
+import { Drizzle } from "../clients.mjs"
 import { dmsDisabledMessage } from "../messages/dmsDisabledMessage.mjs"
 import { memberLeftMessage } from "../messages/memberLeftMessage.mjs"
 import { receivedMessage } from "../messages/receivedMessage.mjs"
@@ -6,13 +6,12 @@ import { sentMessage } from "../messages/sentMessage.mjs"
 import { staffInfoMessage } from "../messages/staffInfoMessage.mjs"
 import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
 import { Config } from "../models/config.mjs"
+import { staffTable, threadsTable } from "../schema.mjs"
 import {
   displayName,
   fetchChannel,
   tryFetchMember,
 } from "./discordUtilities.mjs"
-import type { Thread } from "@prisma/client"
-import { Prisma } from "@prisma/client"
 import type { CommandInteraction, GuildMember } from "discord.js"
 import {
   AttachmentBuilder,
@@ -23,6 +22,8 @@ import {
   Message,
   RESTJSONErrorCodes,
 } from "discord.js"
+import { and, eq } from "drizzle-orm"
+import postgres from "postgres"
 import { Stream } from "stream"
 import { MIMEType } from "util"
 
@@ -64,20 +65,20 @@ export async function createThreadFromMessage(message: Message) {
 
   let thread
   try {
-    thread = await ORM.thread.create({
-      data: {
+    ;[thread] = await Drizzle.insert(threadsTable)
+      .values({
         id: channel.id,
         userId: member.id,
         active: true,
-        source: "DM",
+        source: "dm",
         lastMessage: message.id, // TODO: this is technically wrong
-      },
-    })
+      })
+      .returning()
+    if (!thread) {
+      throw new Error("Couldn't insert a thread")
+    }
   } catch (e) {
-    if (
-      e instanceof Prisma.PrismaClientKnownRequestError &&
-      e.code === "P2002"
-    ) {
+    if (e instanceof postgres.PostgresError && e.code !== "23505") {
       await channel.delete()
     }
 
@@ -86,9 +87,7 @@ export async function createThreadFromMessage(message: Message) {
 
   await channel.messages.pin(channel.id, "Make the message more easy to find")
 
-  const staffMembers = await ORM.staffMember.findMany({
-    where: { addToThread: true },
-  })
+  const staffMembers = await Drizzle.select().from(staffTable)
   for (const staffMember of staffMembers) {
     await channel.members.add(
       staffMember.id,
@@ -126,20 +125,18 @@ export async function createThreadFromInteraction(
 
   let thread
   try {
-    thread = await ORM.thread.create({
-      data: {
-        id: channel.id,
-        userId: member.id,
-        active: true,
-        source: "GUILD",
-        lastMessage: interaction.id,
-      },
+    ;[thread] = await Drizzle.insert(threadsTable).values({
+      id: channel.id,
+      userId: member.id,
+      active: true,
+      source: "guild",
+      lastMessage: interaction.id,
     })
+    if (!thread) {
+      throw new Error("Couldn't insert a thread")
+    }
   } catch (e) {
-    if (
-      e instanceof Prisma.PrismaClientKnownRequestError &&
-      e.code === "P2002"
-    ) {
+    if (e instanceof postgres.PostgresError && e.code !== "23505") {
       await channel.delete()
     }
 
@@ -148,9 +145,7 @@ export async function createThreadFromInteraction(
 
   await channel.messages.pin(channel.id, "Make the message more easy to find")
 
-  const staffMembers = await ORM.staffMember.findMany({
-    where: { addToThread: true },
-  })
+  const staffMembers = await Drizzle.select().from(staffTable)
   for (const staffMember of staffMembers) {
     await channel.members.add(
       staffMember.id,
@@ -181,7 +176,7 @@ export async function createThreadFromInteraction(
 }
 
 export async function processGuildMessage(
-  thread: Thread,
+  thread: typeof threadsTable.$inferSelect,
   message: Message,
   prefix: string,
 ) {
@@ -204,20 +199,18 @@ export async function processGuildMessage(
     }
 
     await message.channel.send(dmsDisabledMessage(member, message))
-    await ORM.thread.update({
-      where: { id: thread.id },
-      data: { lastMessage: message.id },
-    })
+    await Drizzle.update(threadsTable)
+      .set({ lastMessage: message.id })
+      .where(eq(threadsTable.id, thread.id))
     return
   }
 
   await message.channel.send(await sentMessage(message, prefix))
   await message.delete()
 
-  await ORM.thread.update({
-    where: { id: thread.id },
-    data: { lastMessage: message.id },
-  })
+  await Drizzle.update(threadsTable)
+    .set({ lastMessage: message.id })
+    .where(eq(threadsTable.id, thread.id))
 
   const author = (await tryFetchMember(guild, message.author)) ?? message.author
 
@@ -235,9 +228,14 @@ export async function processGuildMessage(
 }
 
 export async function processDmMessage(message: Message) {
-  let thread = await ORM.thread.findFirst({
-    where: { userId: message.author.id, active: true },
-  })
+  let [thread] = await Drizzle.select()
+    .from(threadsTable)
+    .where(
+      and(
+        eq(threadsTable.userId, message.author.id),
+        eq(threadsTable.active, true),
+      ),
+    )
 
   if (!thread) {
     thread = await createThreadFromMessage(message)
@@ -262,10 +260,9 @@ export async function processDmMessage(message: Message) {
     }
   }
 
-  await ORM.thread.update({
-    where: { id: thread.id },
-    data: { lastMessage: message.id },
-  })
+  await Drizzle.update(threadsTable)
+    .set({ lastMessage: message.id })
+    .where(eq(threadsTable.id, thread.id))
 
   await channel.messages.edit(thread.id, {
     content: `📥 ${bold(displayName(member ?? message.author))}: ${

@@ -1,7 +1,9 @@
-import type { Thread } from "@prisma/client"
+import { threadsTable } from "../schema.mjs"
 import { channelMention, EmbedBuilder } from "discord.js"
 
-export function threadAlreadyExistsMessage(thread: Thread) {
+export function threadAlreadyExistsMessage(
+  thread: typeof threadsTable.$inferSelect,
+) {
   return {
     embeds: [
       new EmbedBuilder()

@@ -1,11 +1,11 @@
-import { ORM } from "../clients.mjs"
+import { Drizzle } from "../clients.mjs"
 import { component } from "../models/component.mjs"
 import { Config } from "../models/config.mjs"
+import { blockedTable, threadsTable } from "../schema.mjs"
 import { fetchChannel } from "../utilities/discordUtilities.mjs"
 import { processDmMessage } from "../utilities/threadUtilities.mjs"
 import { blockedMessage } from "./blockedMessage.mjs"
 import { dmThreadExistsMessage } from "./dmThreadExistsMessage.mjs"
-import { Prisma } from "@prisma/client"
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -19,6 +19,8 @@ import type {
   MessageActionRowComponentBuilder,
   EmbedFooterOptions,
 } from "discord.js"
+import { and, eq } from "drizzle-orm"
+import postgres from "postgres"
 
 const createThreadButton = component({
   type: ComponentType.Button,
@@ -40,17 +42,22 @@ const createThreadButton = component({
       return
     }
 
-    const prismaUser = await ORM.user.findFirst({
-      where: { id: interaction.user.id },
-    })
-    if (prismaUser?.blocked) {
+    const [dbUser] = await Drizzle.select()
+      .from(blockedTable)
+      .where(eq(blockedTable.id, interaction.user.id))
+    if (dbUser) {
       await interaction.reply(blockedMessage())
       return
     }
 
-    const thread = await ORM.thread.findFirst({
-      where: { userId: interaction.user.id, active: true },
-    })
+    const [thread] = await Drizzle.select()
+      .from(threadsTable)
+      .where(
+        and(
+          eq(threadsTable.userId, interaction.user.id),
+          eq(threadsTable.active, true),
+        ),
+      )
 
     if (thread) {
       await interaction.reply(dmThreadExistsMessage())
@@ -69,10 +76,7 @@ const createThreadButton = component({
     try {
       await processDmMessage(message)
     } catch (e) {
-      if (
-        !(e instanceof Prisma.PrismaClientKnownRequestError) ||
-        e.code !== "P2002"
-      ) {
+      if (!(e instanceof postgres.PostgresError) || e.code !== "23505") {
         throw e
       }
 

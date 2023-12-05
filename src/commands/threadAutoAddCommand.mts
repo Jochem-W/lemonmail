@@ -1,6 +1,8 @@
-import { ORM } from "../clients.mjs"
+import { Drizzle } from "../clients.mjs"
 import { slashCommand } from "../models/slashCommand.mjs"
+import { staffTable } from "../schema.mjs"
 import { EmbedBuilder, PermissionFlagsBits } from "discord.js"
+import { eq } from "drizzle-orm"
 
 export const ThreadAutoAddCommand = slashCommand({
   name: "thread-auto-add",
@@ -9,30 +11,22 @@ export const ThreadAutoAddCommand = slashCommand({
   defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
   dmPermission: false,
   async handle(interaction) {
-    await interaction.deferReply({ ephemeral: true })
-
-    let staffMember = await ORM.staffMember.findFirst({
-      where: { id: interaction.user.id },
-    })
+    const [staffMember] = await Drizzle.delete(staffTable)
+      .where(eq(staffTable.id, interaction.user.id))
+      .returning()
 
     if (!staffMember) {
-      staffMember = await ORM.staffMember.create({
-        data: { id: interaction.user.id, addToThread: true },
-      })
-    } else {
-      staffMember = await ORM.staffMember.update({
-        where: { id: staffMember.id },
-        data: { addToThread: !staffMember.addToThread },
-      })
+      await Drizzle.insert(staffTable).values({ id: interaction.user.id })
     }
 
-    await interaction.editReply({
+    await interaction.reply({
+      ephemeral: true,
       embeds: [
         new EmbedBuilder()
           .setTitle("Settings updated")
           .setDescription(
             `You will now ${
-              !staffMember.addToThread ? "no longer" : ""
+              staffMember ? "no longer" : ""
             } be added to new modmail threads`,
           ),
       ],

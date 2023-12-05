@@ -1,5 +1,6 @@
-import { ORM } from "../clients.mjs"
+import { Drizzle } from "../clients.mjs"
 import { slashCommand, slashOption } from "../models/slashCommand.mjs"
+import { blockedTable } from "../schema.mjs"
 import {
   EmbedBuilder,
   PermissionFlagsBits,
@@ -7,21 +8,17 @@ import {
   User,
   userMention,
 } from "discord.js"
+import { eq } from "drizzle-orm"
 
 export async function block(user: User) {
-  let prismaUser = await ORM.user.findFirst({ where: { id: user.id } })
-  if (!prismaUser) {
-    prismaUser = await ORM.user.create({
-      data: { id: user.id, blocked: true },
-    })
-  } else {
-    prismaUser = await ORM.user.update({
-      where: { id: user.id },
-      data: { blocked: !prismaUser.blocked },
-    })
+  const [dbUser] = await Drizzle.delete(blockedTable)
+    .where(eq(blockedTable.id, user.id))
+    .returning()
+  if (!dbUser) {
+    await Drizzle.insert(blockedTable).values({ id: user.id }).returning()
   }
 
-  const verb = `${prismaUser.blocked ? "" : "un"}blocked`
+  const verb = `${dbUser ? "un" : ""}blocked`
   return {
     embeds: [
       new EmbedBuilder()
@@ -35,26 +32,6 @@ export async function block(user: User) {
     ephemeral: true,
   }
 }
-
-// export class BlockCommand extends ChatInputCommand {
-//   public constructor() {
-//     super(
-//       "block",
-//       "Toggles whether a user is able to open modmail threads",
-//       PermissionFlagsBits.ModerateMembers
-//     )
-//     this.builder.addStringOption((builder) =>
-//       builder
-//         .setName("user")
-//         .setDescription("The target user")
-//         .setRequired(true)
-//     )
-//   }
-
-//   public async handle(interaction: ChatInputCommandInteraction) {
-//     await block(interaction)
-//   }
-// }
 
 export const BlockCommand = slashCommand({
   name: "block",

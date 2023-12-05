@@ -1,7 +1,8 @@
-import { ORM } from "../clients.mjs"
+import { Drizzle } from "../clients.mjs"
 import { RegisteredCommands } from "../commands.mjs"
 import { CommandNotFoundByNameError } from "../errors.mjs"
 import { Config } from "../models/config.mjs"
+import { threadsTable } from "../schema.mjs"
 import { displayName } from "../utilities/discordUtilities.mjs"
 import type { GuildMember } from "discord.js"
 import {
@@ -12,6 +13,7 @@ import {
   roleMention,
   userMention,
 } from "discord.js"
+import { eq } from "drizzle-orm"
 
 function formatPrefixes() {
   if (Config.sendPrefixes.length === 0) {
@@ -36,7 +38,9 @@ function formatPrefixes() {
 }
 
 export async function staffInfoMessage(member: GuildMember) {
-  const threads = await ORM.thread.findMany({ where: { userId: member.id } })
+  const threads = await Drizzle.select()
+    .from(threadsTable)
+    .where(eq(threadsTable.userId, member.id))
 
   const roles = [...member.roles.cache.values()]
 

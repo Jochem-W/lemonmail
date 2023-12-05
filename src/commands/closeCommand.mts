@@ -1,8 +1,9 @@
-import { ORM } from "../clients.mjs"
+import { Drizzle } from "../clients.mjs"
 import { invalidThreadMessage } from "../messages/invalidThreadMessage.mjs"
 import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
 import { Config } from "../models/config.mjs"
 import { slashCommand, slashOption } from "../models/slashCommand.mjs"
+import { threadsTable } from "../schema.mjs"
 import {
   displayName,
   fetchChannel,
@@ -19,6 +20,7 @@ import {
   SlashCommandBooleanOption,
   SlashCommandStringOption,
 } from "discord.js"
+import { and, eq } from "drizzle-orm"
 
 export const CloseCommand = slashCommand({
   name: "close",
@@ -46,9 +48,14 @@ export const CloseCommand = slashCommand({
   async handle(interaction, reason, silent) {
     const guild = await interactionGuild(interaction, true)
 
-    const thread = await ORM.thread.findFirst({
-      where: { id: interaction.channelId, active: true },
-    })
+    const [thread] = await Drizzle.select()
+      .from(threadsTable)
+      .where(
+        and(
+          eq(threadsTable.id, interaction.channelId),
+          eq(threadsTable.active, true),
+        ),
+      )
     if (!thread) {
       await interaction.reply(invalidThreadMessage())
       return
@@ -81,10 +88,10 @@ export const CloseCommand = slashCommand({
 
     await interaction.deferReply()
 
-    await ORM.thread.update({
-      where: { id: thread.id },
-      data: { active: null, closedReason: reason },
-    })
+    await Drizzle.update(threadsTable)
+      .set({ active: null, closedReason: reason })
+      .where(eq(threadsTable.id, thread.id))
+      .returning()
 
     await interaction.editReply(
       await threadStatusMessage(interaction, "closed", reason ?? undefined),

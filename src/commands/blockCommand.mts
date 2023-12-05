@@ -1,10 +1,9 @@
 import { Drizzle } from "../clients.mjs"
-import { slashCommand, slashOption } from "../models/slashCommand.mjs"
+import { slashCommand } from "../models/slashCommand.mjs"
 import { blockedTable } from "../schema.mjs"
 import {
   EmbedBuilder,
   PermissionFlagsBits,
-  SlashCommandUserOption,
   User,
   userMention,
 } from "discord.js"
@@ -38,13 +37,9 @@ export const BlockCommand = slashCommand({
   description: "Toggles whether a user is able to open modmail threads",
   defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
   dmPermission: false,
+  nsfw: false,
   options: [
-    slashOption(
-      true,
-      new SlashCommandUserOption()
-        .setName("user")
-        .setDescription("Target user"),
-    ),
+    { name: "user", description: "Target user", type: "user", required: true },
   ],
   async handle(interaction, user) {
     await interaction.reply(await block(user))

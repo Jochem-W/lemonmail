@@ -10,6 +10,7 @@ export const ThreadAutoAddCommand = slashCommand({
     "Toggles whether you're automatically added to new modmail threads",
   defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
   dmPermission: false,
+  nsfw: false,
   async handle(interaction) {
     const [staffMember] = await Drizzle.delete(staffTable)
       .where(eq(staffTable.id, interaction.user.id))

@@ -2,7 +2,7 @@ import { Drizzle } from "../clients.mjs"
 import { invalidThreadMessage } from "../messages/invalidThreadMessage.mjs"
 import { threadStatusMessage } from "../messages/threadStatusMessage.mjs"
 import { Config } from "../models/config.mjs"
-import { slashCommand, slashOption } from "../models/slashCommand.mjs"
+import { slashCommand } from "../models/slashCommand.mjs"
 import { threadsTable } from "../schema.mjs"
 import {
   displayName,
@@ -17,8 +17,6 @@ import {
   EmbedBuilder,
   PermissionFlagsBits,
   RESTJSONErrorCodes,
-  SlashCommandBooleanOption,
-  SlashCommandStringOption,
 } from "discord.js"
 import { and, eq } from "drizzle-orm"
 
@@ -27,23 +25,21 @@ export const CloseCommand = slashCommand({
   description: "Close the current thread",
   defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
   dmPermission: false,
+  nsfw: false,
   options: [
-    slashOption(
-      false,
-      new SlashCommandStringOption()
-        .setName("reason")
-        .setDescription(
-          "The reason for closing the thread, not sent to the user",
-        ),
-    ),
-    slashOption(
-      false,
-      new SlashCommandBooleanOption()
-        .setName("silent")
-        .setDescription(
-          "Whether to notify the user when the thread is closed; defaults to False",
-        ),
-    ),
+    {
+      name: "reason",
+      description: "The reason for closing the thread, not sent to the user",
+      type: "string",
+      required: false,
+    },
+    {
+      name: "silent",
+      description:
+        "Don't send a message to the user when the thread is closed; defaults to False",
+      type: "boolean",
+      required: false,
+    },
   ],
   async handle(interaction, reason, silent) {
     const guild = await interactionGuild(interaction, true)

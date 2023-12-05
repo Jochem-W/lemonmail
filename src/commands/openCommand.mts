@@ -3,12 +3,12 @@ import { threadAlreadyExistsMessage } from "../messages/threadAlreadyExistsMessa
 import { threadOpenedMessage } from "../messages/threadOpenedMessage.mjs"
 import { userIsBotMessage } from "../messages/userIsBotMessage.mjs"
 import { userNotInGuildMessage } from "../messages/userNotInGuildMessage.mjs"
-import { slashCommand, slashOption } from "../models/slashCommand.mjs"
+import { slashCommand } from "../models/slashCommand.mjs"
 import { threadsTable } from "../schema.mjs"
 import { tryFetchMember } from "../utilities/discordUtilities.mjs"
 import { interactionGuild } from "../utilities/interactionUtilities.mjs"
 import { createThreadFromInteraction } from "../utilities/threadUtilities.mjs"
-import { PermissionFlagsBits, SlashCommandUserOption } from "discord.js"
+import { PermissionFlagsBits } from "discord.js"
 import { and, eq } from "drizzle-orm"
 
 export const OpenCommand = slashCommand({
@@ -16,13 +16,14 @@ export const OpenCommand = slashCommand({
   description: "Open a modmail thread for this user",
   defaultMemberPermissions: PermissionFlagsBits.ModerateMembers,
   dmPermission: false,
+  nsfw: false,
   options: [
-    slashOption(
-      true,
-      new SlashCommandUserOption()
-        .setName("user")
-        .setDescription("The user to open a thread for"),
-    ),
+    {
+      name: "user",
+      description: "The user to open a thread for",
+      type: "user",
+      required: true,
+    },
   ],
   async handle(interaction, user) {
     const guild = await interactionGuild(interaction, true)

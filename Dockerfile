@@ -5,7 +5,7 @@ ENV NODE_ENV=development
 WORKDIR /app
 
 # Copy package.json, lockfile, .npmrc and prisma
-COPY ["pnpm-lock.yaml", "package.json", ".npmrc", "prisma", "./"]
+COPY ["pnpm-lock.yaml", "package.json", ".npmrc", "./"]
 
 # Install build tools
 RUN apk add --no-cache alpine-sdk python3 openssl && \

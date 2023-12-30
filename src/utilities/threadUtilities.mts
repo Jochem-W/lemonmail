@@ -89,10 +89,20 @@ export async function createThreadFromMessage(message: Message) {
 
   const staffMembers = await Drizzle.select().from(staffTable)
   for (const staffMember of staffMembers) {
-    await channel.members.add(
-      staffMember.id,
-      "Staff member has opted in to pings",
-    )
+    try {
+      await channel.members.add(
+        staffMember.id,
+        "Staff member has opted in to pings",
+      )
+    } catch (e) {
+      if (
+        !(e instanceof DiscordAPIError) ||
+        (e.code !== RESTJSONErrorCodes.MissingAccess &&
+          e.code !== RESTJSONErrorCodes.UnknownMember)
+      ) {
+        throw e
+      }
+    }
   }
 
   await member.send(
@@ -147,10 +157,20 @@ export async function createThreadFromInteraction(
 
   const staffMembers = await Drizzle.select().from(staffTable)
   for (const staffMember of staffMembers) {
-    await channel.members.add(
-      staffMember.id,
-      "Staff member has opted in to pings",
-    )
+    try {
+      await channel.members.add(
+        staffMember.id,
+        "Staff member has opted in to pings",
+      )
+    } catch (e) {
+      if (
+        !(e instanceof DiscordAPIError) ||
+        (e.code !== RESTJSONErrorCodes.MissingAccess &&
+          e.code !== RESTJSONErrorCodes.UnknownMember)
+      ) {
+        throw e
+      }
+    }
   }
 
   try {

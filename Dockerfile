@@ -16,8 +16,7 @@ RUN apk add --no-cache alpine-sdk python3 openssl && \
 COPY . .
 
 # Compile Typescript and remove dev packages
-RUN pnpm prisma generate && \
-    pnpm tsc && \
+RUN pnpm tsc && \
     pnpm prune --prod
 
 # Set-up running image

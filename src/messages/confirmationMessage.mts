@@ -2,7 +2,6 @@ import { Drizzle } from "../clients.mjs"
 import { component } from "../models/component.mjs"
 import { Config } from "../models/config.mjs"
 import { blockedTable, threadsTable } from "../schema.mjs"
-import { fetchChannel } from "../utilities/discordUtilities.mjs"
 import { processDmMessage } from "../utilities/threadUtilities.mjs"
 import { blockedMessage } from "./blockedMessage.mjs"
 import { dmThreadExistsMessage } from "./dmThreadExistsMessage.mjs"
@@ -10,22 +9,22 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ChannelType,
   ComponentType,
   EmbedBuilder,
-  Message,
 } from "discord.js"
 import type {
   MessageActionRowComponentBuilder,
   EmbedFooterOptions,
+  User,
+  FetchMessagesOptions,
 } from "discord.js"
-import { and, eq } from "drizzle-orm"
+import { and, desc, eq } from "drizzle-orm"
 import postgres from "postgres"
 
 const createThreadButton = component({
   type: ComponentType.Button,
   name: "create-thread",
-  async handle(interaction, type, channelId, messageId) {
+  async handle(interaction, type, userId) {
     const rows = interaction.message.components.map(
       (row) =>
         new ActionRowBuilder<MessageActionRowComponentBuilder>(row.toJSON()),
@@ -66,15 +65,39 @@ const createThreadButton = component({
 
     await interaction.update({ components: rows })
 
-    const channel = await fetchChannel(
-      interaction.client,
-      channelId,
-      ChannelType.DM,
+    const [oldThread] = await Drizzle.select()
+      .from(threadsTable)
+      .where(
+        and(
+          eq(threadsTable.userId, interaction.user.id),
+          eq(threadsTable.active, false),
+        ),
+      )
+      .orderBy(desc(threadsTable.id))
+      .limit(1)
+
+    const fetchOptions: FetchMessagesOptions = { limit: 10 }
+    if (oldThread) {
+      fetchOptions.after = oldThread.lastMessage
+    }
+
+    const user = await interaction.client.users.fetch(userId)
+    const channel = user.dmChannel ?? (await user.createDM())
+
+    const messageCollection = await channel.messages.fetch(fetchOptions)
+    const rest = [...messageCollection.values()].filter(
+      (message) => message.author.id === user.id,
     )
-    const message = await channel.messages.fetch(messageId) // TODO
+
+    const message = rest[0]
+    rest.splice(1)
+
+    if (!message) {
+      throw new Error()
+    }
 
     try {
-      await processDmMessage(message)
+      await processDmMessage(message, ...rest)
     } catch (e) {
       if (!(e instanceof postgres.PostgresError) || e.code !== "23505") {
         throw e
@@ -85,8 +108,8 @@ const createThreadButton = component({
   },
 })
 
-export async function confirmationMessage(message: Message) {
-  const guild = await message.client.guilds.fetch(Config.guild)
+export async function confirmationMessage(user: User) {
+  const guild = await user.client.guilds.fetch(Config.guild)
 
   const footer: EmbedFooterOptions = { text: guild.name }
   const iconURL = guild.iconURL()
@@ -99,23 +122,20 @@ export async function confirmationMessage(message: Message) {
       new EmbedBuilder()
         .setTitle("Create a new thread?")
         .setDescription(
-          "You currently don't have an active thread. Would you like to create a new thread using this message?",
+          "You currently don't have an active thread. Would you like to create a new thread using the above message(s)?",
         )
-        .setFooter(footer)
-        .setTimestamp(message.createdAt),
+        .setFooter(footer),
     ],
     components: [
       new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
         new ButtonBuilder()
           .setStyle(ButtonStyle.Primary)
           .setLabel("Yes")
-          .setCustomId(
-            createThreadButton("yes", message.channelId, message.id),
-          ),
+          .setCustomId(createThreadButton("yes", user.id)),
         new ButtonBuilder()
           .setStyle(ButtonStyle.Secondary)
           .setLabel("No")
-          .setCustomId(createThreadButton("no", message.channelId, message.id)),
+          .setCustomId(createThreadButton("no", user.id)),
       ),
     ],
   }

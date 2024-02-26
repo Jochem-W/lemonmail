@@ -247,46 +247,62 @@ export async function processGuildMessage(
   }
 }
 
-export async function processDmMessage(message: Message) {
+export async function processDmMessage(
+  firstMessage: Message,
+  ...otherMessages: Message[]
+) {
   let [thread] = await Drizzle.select()
     .from(threadsTable)
     .where(
       and(
-        eq(threadsTable.userId, message.author.id),
+        eq(threadsTable.userId, firstMessage.author.id),
         eq(threadsTable.active, true),
       ),
     )
 
   if (!thread) {
-    thread = await createThreadFromMessage(message)
+    thread = await createThreadFromMessage(firstMessage)
   }
 
   const channel = await fetchChannel(
-    message.client,
+    firstMessage.client,
     thread.id,
     ChannelType.PublicThread,
   )
 
-  await channel.send(await receivedMessage(message))
+  const member = await tryFetchMember(channel.guild, firstMessage.author.id)
 
-  const member = await tryFetchMember(channel.guild, message.author.id)
-  try {
-    await message.author.send(await sentMessage(message))
-  } catch (e) {
-    if (!member) {
-      await channel.send(memberLeftMessage(thread))
-    } else {
-      await channel.send(dmsDisabledMessage(member))
+  const allMessages = [firstMessage, ...otherMessages]
+  const lastMessage = allMessages.at(-1) ?? firstMessage
+
+  let errored = false
+
+  for (const message of allMessages) {
+    await channel.send(await receivedMessage(message))
+
+    try {
+      await message.author.send(await sentMessage(message))
+    } catch (e) {
+      if (errored) {
+        continue
+      }
+
+      errored = true
+      if (!member) {
+        await channel.send(memberLeftMessage(thread))
+      } else {
+        await channel.send(dmsDisabledMessage(member))
+      }
     }
   }
 
   await Drizzle.update(threadsTable)
-    .set({ lastMessage: message.id })
+    .set({ lastMessage: lastMessage.id })
     .where(eq(threadsTable.id, thread.id))
 
   await channel.messages.edit(thread.id, {
-    content: `📥 ${bold(displayName(member ?? message.author))}: ${
-      message.content || "[no text content]"
+    content: `📥 ${bold(displayName(member ?? lastMessage.author))}: ${
+      lastMessage.content || "[no text content]"
     }`,
   })
   await channel.setAppliedTags([Config.tags.open, Config.tags.awaitingStaff])

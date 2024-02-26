@@ -13,16 +13,16 @@ import {
 type Interaction<T extends ComponentType> = T extends ComponentType.Button
   ? ButtonInteraction
   : T extends ComponentType.StringSelect
-  ? StringSelectMenuInteraction
-  : T extends ComponentType.UserSelect
-  ? UserSelectMenuInteraction
-  : T extends ComponentType.RoleSelect
-  ? RoleSelectMenuInteraction
-  : T extends ComponentType.MentionableSelect
-  ? MentionableSelectMenuInteraction
-  : T extends ComponentType.ChannelSelect
-  ? ChannelSelectMenuInteraction
-  : never
+    ? StringSelectMenuInteraction
+    : T extends ComponentType.UserSelect
+      ? UserSelectMenuInteraction
+      : T extends ComponentType.RoleSelect
+        ? RoleSelectMenuInteraction
+        : T extends ComponentType.MentionableSelect
+          ? MentionableSelectMenuInteraction
+          : T extends ComponentType.ChannelSelect
+            ? ChannelSelectMenuInteraction
+            : never
 
 export type Component<T extends ComponentType> = {
   type: T

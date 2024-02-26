@@ -94,46 +94,48 @@ type SlashOptionTypeSimple =
 type SlashOptionType<Type extends SlashOptionTypeSimple> = Type extends "string"
   ? ApplicationCommandOptionType.String
   : Type extends SlashCommandIntegerOption
-  ? ApplicationCommandOptionType.Integer
-  : Type extends SlashCommandBooleanOption
-  ? ApplicationCommandOptionType.Boolean
-  : Type extends SlashCommandUserOption
-  ? ApplicationCommandOptionType.User
-  : Type extends SlashCommandChannelOption
-  ? ApplicationCommandOptionType.Channel
-  : Type extends SlashCommandRoleOption
-  ? ApplicationCommandOptionType.Role
-  : Type extends SlashCommandMentionableOption
-  ? ApplicationCommandOptionType.Mentionable
-  : Type extends SlashCommandNumberOption
-  ? ApplicationCommandOptionType.Number
-  : Type extends SlashCommandAttachmentOption
-  ? ApplicationCommandOptionType.Attachment
-  : never
+    ? ApplicationCommandOptionType.Integer
+    : Type extends SlashCommandBooleanOption
+      ? ApplicationCommandOptionType.Boolean
+      : Type extends SlashCommandUserOption
+        ? ApplicationCommandOptionType.User
+        : Type extends SlashCommandChannelOption
+          ? ApplicationCommandOptionType.Channel
+          : Type extends SlashCommandRoleOption
+            ? ApplicationCommandOptionType.Role
+            : Type extends SlashCommandMentionableOption
+              ? ApplicationCommandOptionType.Mentionable
+              : Type extends SlashCommandNumberOption
+                ? ApplicationCommandOptionType.Number
+                : Type extends SlashCommandAttachmentOption
+                  ? ApplicationCommandOptionType.Attachment
+                  : never
 
 type SlashOptionValueType<Type extends SlashOptionTypeSimple> =
   Type extends "string"
     ? string
     : Type extends "integer"
-    ? number
-    : Type extends "boolean"
-    ? boolean
-    : Type extends "user"
-    ? User
-    : Type extends "channel"
-    ? Channel
-    : Type extends "role"
-    ? Role
-    : Type extends "mentionable"
-    ? Exclude<
-        ReturnType<CommandInteractionOptionResolver["getMentionable"]>,
-        null
-      >
-    : Type extends "number"
-    ? number
-    : Type extends "attachment"
-    ? Attachment
-    : never
+      ? number
+      : Type extends "boolean"
+        ? boolean
+        : Type extends "user"
+          ? User
+          : Type extends "channel"
+            ? Channel
+            : Type extends "role"
+              ? Role
+              : Type extends "mentionable"
+                ? Exclude<
+                    ReturnType<
+                      CommandInteractionOptionResolver["getMentionable"]
+                    >,
+                    null
+                  >
+                : Type extends "number"
+                  ? number
+                  : Type extends "attachment"
+                    ? Attachment
+                    : never
 
 type SlashOptionValueTypeWithRequired<
   Type extends SlashOptionTypeSimple,

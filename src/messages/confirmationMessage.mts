@@ -90,7 +90,7 @@ const createThreadButton = component({
     )
 
     const message = rest[0]
-    rest.splice(1)
+    rest.splice(0, 1)
 
     if (!message) {
       throw new Error()

@@ -89,6 +89,8 @@ const createThreadButton = component({
       (message) => message.author.id === user.id,
     )
 
+    rest.reverse()
+
     const message = rest[0]
     rest.splice(0, 1)
 

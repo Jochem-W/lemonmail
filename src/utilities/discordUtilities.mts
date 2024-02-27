@@ -72,7 +72,6 @@ export async function fetchChannel<T extends ChannelType>(
   options?: FetchChannelOptions,
 ) {
   const channel = await client.channels.fetch(id, {
-    allowUnknownGuild: true,
     ...options,
   })
   if (!channel) {

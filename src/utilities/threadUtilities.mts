@@ -197,7 +197,7 @@ export async function createThreadFromInteraction(
 
 export async function processGuildMessage(
   thread: typeof threadsTable.$inferSelect,
-  message: Message,
+  message: Message<true>,
   prefix: string,
 ) {
   const guild = await message.client.guilds.fetch(Config.guild)

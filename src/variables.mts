@@ -3,8 +3,8 @@ import { z } from "zod"
 
 const model = z
   .object({
-    DISCORD_BOT_TOKEN: z.string(),
     DATABASE_URL: z.string(),
+    DISCORD_BOT_TOKEN: z.string(),
   })
   .transform((arg) => camelcaseKeys(arg))
 

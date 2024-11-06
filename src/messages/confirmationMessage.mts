@@ -19,6 +19,7 @@ import type {
   FetchMessagesOptions,
 } from "discord.js"
 import { and, desc, eq } from "drizzle-orm"
+import { DateTime } from "luxon"
 import postgres from "postgres"
 
 const createThreadButton = component({
@@ -86,7 +87,10 @@ const createThreadButton = component({
 
     const messageCollection = await channel.messages.fetch(fetchOptions)
     const rest = [...messageCollection.values()].filter(
-      (message) => message.author.id === user.id,
+      (message) =>
+        message.author.id === user.id &&
+        DateTime.fromJSDate(message.createdAt).diffNow().negate().as("hours") <
+          1,
     )
 
     rest.reverse()

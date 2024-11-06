@@ -11,6 +11,7 @@ import {
 } from "../utilities/threadUtilities.mjs"
 import { ChannelType } from "discord.js"
 import { eq } from "drizzle-orm"
+import { DateTime } from "luxon"
 
 export const RestartHandler = handler({
   event: "ready",
@@ -34,14 +35,28 @@ export const RestartHandler = handler({
         limit: 100,
         after: thread.lastMessage,
       })) {
-        messages.push(message)
+        if (
+          DateTime.fromJSDate(message.createdAt)
+            .diffNow()
+            .negate()
+            .as("hours") < 1
+        ) {
+          messages.push(message)
+        }
       }
 
       for (const [, message] of await threadChannel.messages.fetch({
         limit: 100,
         after: thread.lastMessage,
       })) {
-        messages.push(message)
+        if (
+          DateTime.fromJSDate(message.createdAt)
+            .diffNow()
+            .negate()
+            .as("hours") < 1
+        ) {
+          messages.push(message)
+        }
       }
 
       messages.sort((a, b) => {

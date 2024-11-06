@@ -283,6 +283,7 @@ export async function processDmMessage(
     try {
       await message.author.send(await sentMessage(message))
     } catch (e) {
+      console.error(e)
       if (errored) {
         continue
       }

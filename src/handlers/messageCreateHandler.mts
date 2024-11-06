@@ -1,4 +1,3 @@
-import { Message, Snowflake } from "discord.js"
 import { Drizzle } from "../clients.mjs"
 import { confirmationMessage } from "../messages/confirmationMessage.mjs"
 import { handler } from "../models/handler.mjs"
@@ -10,6 +9,7 @@ import {
   processDmMessage,
   processGuildMessage,
 } from "../utilities/threadUtilities.mjs"
+import { Message, Snowflake } from "discord.js"
 import { and, eq } from "drizzle-orm"
 
 const confirmations = new Map<Snowflake, Message>()
@@ -34,11 +34,14 @@ export const MessageCreateHandler = handler({
 
       if (!thread) {
         const previous = confirmations.get(message.author.id)
-        if (previous && previous.deletable) {
+        if (previous?.deletable) {
           await previous.delete()
         }
 
-        confirmations.set(message.author.id, await message.channel.send(await confirmationMessage(message.author)))
+        confirmations.set(
+          message.author.id,
+          await message.channel.send(await confirmationMessage(message.author)),
+        )
         return
       }
 

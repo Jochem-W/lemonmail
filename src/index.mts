@@ -7,6 +7,7 @@ import {
 import { CommandNotFoundByNameError, logError } from "./errors.mjs"
 import { Handlers } from "./handlers.mjs"
 import { Config } from "./models/config.mjs"
+import { Handler } from "./models/handler.mjs"
 import type { Command } from "./types/command.mjs"
 import { Variables } from "./variables.mjs"
 import {
@@ -19,6 +20,7 @@ import {
 import type {
   RESTPutAPIApplicationGuildCommandsResult,
   RESTPutAPIApplicationGuildCommandsJSONBody,
+  ClientEvents,
 } from "discord.js"
 
 const discord = new Client({
@@ -88,33 +90,28 @@ for (const applicationCommand of applicationCommands) {
   RegisteredCommands.set(applicationCommand.id, command)
 }
 
+async function listener<T extends keyof ClientEvents>(
+  handler: Handler<T>,
+  ...args: ClientEvents[T]
+) {
+  try {
+    await handler.handle(...args)
+  } catch (e) {
+    if (!(e instanceof Error)) {
+      throw e
+    }
+
+    await logError(discord, e)
+  }
+}
+
 for (const handler of Handlers) {
   if (handler.once) {
-    discord.once(handler.event, async (...args) => {
-      try {
-        await handler.handle(...args)
-      } catch (e) {
-        if (!(e instanceof Error)) {
-          throw e
-        }
-
-        await logError(discord, e)
-      }
-    })
+    discord.once(handler.event, (...args) => void listener(handler, ...args))
     continue
   }
 
-  discord.on(handler.event, async (...args) => {
-    try {
-      await handler.handle(...args)
-    } catch (e) {
-      if (!(e instanceof Error)) {
-        throw e
-      }
-
-      await logError(discord, e)
-    }
-  })
+  discord.on(handler.event, (...args) => void listener(handler, ...args))
 }
 
 await discord.login(Variables.discordBotToken)

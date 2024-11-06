@@ -12,9 +12,7 @@ export const threadsTable = pgTable(
     closedReason: text("closedReason"),
     lastMessage: text("lastMessage").notNull(),
   },
-  (table) => ({
-    unique: unique().on(table.active, table.userId),
-  }),
+  (table) => [unique().on(table.active, table.userId)],
 )
 
 export const staffTable = pgTable("staff", {
